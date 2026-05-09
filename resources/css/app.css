@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --color-on-surface-variant: #3d4949;
+    --color-surface-container: #eeeef0;
+    --color-secondary: #006a65;
+    --color-inverse-surface: #2f3133;
+    --color-outline: #6d7979;
+    --color-surface-tint: #006a6a;
+    --color-outline-variant: #bcc9c8;
+    --color-surface: #f9f9fc;
+    --color-surface-variant: #e2e2e5;
+    --color-primary-container: #008282;
+    --color-background: #f9f9fc;
+    --color-on-surface: #1a1c1e;
+    --color-surface-bright: #f9f9fc;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-dim: #dadadc;
+    --color-surface-container-highest: #e2e2e5;
+    --color-primary: #006767;
+    --color-surface-container-high: #e8e8ea;
+    --color-surface-container-low: #f3f3f6;
+    --color-tertiary: #006a3b;
+    --color-on-primary: #ffffff;
+    --color-on-background: #1a1c1e;
+
+    --font-headline-lg: "Manrope", sans-serif;
+    --font-label-sm: "Inter", sans-serif;
+    --font-body-md: "Inter", sans-serif;
+    --font-headline-md: "Manrope", sans-serif;
+    --font-body-lg: "Inter", sans-serif;
+    --font-display-lg: "Manrope", sans-serif;
+    --font-label-lg: "Inter", sans-serif;
+}
