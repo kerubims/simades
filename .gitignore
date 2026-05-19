@@ -25,12 +25,3 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
-
-# Custom ignores
-/credential/
-/whatsapp-gateway/node_modules/
-/whatsapp-gateway/sessions/
-/whatsapp-gateway/auth_info_baileys/
-**/node_modules/
-**/sessions/
-**/auth_info_baileys/
