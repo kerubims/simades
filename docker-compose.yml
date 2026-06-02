@@ -1,0 +1,78 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: simades-app
+    restart: unless-stopped
+    expose:
+      - "9000"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - simades-network
+    entrypoint: |
+      bash -c "
+        if [ ! -d vendor ]; then composer install --no-dev --optimize-autoloader --no-interaction; fi;
+        chown -R www-data:www-data storage bootstrap/cache storage/logs/laravel.log 2>/dev/null || true;
+        php-fpm --nodaemonize
+      "
+
+  nginx:
+    image: nginx:alpine
+    container_name: simades-nginx
+    restart: unless-stopped
+    ports:
+      - "9004:9000"
+    volumes:
+      - .:/var/www/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+    networks:
+      - simades-network
+
+  db:
+    image: mysql:8.0
+    container_name: simades-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: simades
+      MYSQL_USER: simades
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: rootsecret
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - simades-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootsecret"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  whatsapp:
+    build:
+      context: ./whatsapp-gateway
+      dockerfile: Dockerfile
+    container_name: simades-whatsapp
+    restart: unless-stopped
+    ports:
+      - "9005:3001"
+    volumes:
+      - ./whatsapp-gateway/sessions:/app/sessions
+      - ./whatsapp-gateway/auth_info_baileys:/app/auth_info_baileys
+    networks:
+      - simades-network
+
+networks:
+  simades-network:
+    driver: bridge
+
+volumes:
+  dbdata:

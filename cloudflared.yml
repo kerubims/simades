@@ -1,0 +1,12 @@
+# Cloudflare Tunnel Configuration for SIMADES
+# Run: cloudflared tunnel run <TUNNEL_NAME>
+#
+# Or use CLI directly:
+# cloudflared tunnel route dns <TUNNEL_NAME> simades.ksm.web.id
+
+ingress:
+  - hostname: wa.simades.ksm.web.id
+    service: http://localhost:9005
+  - hostname: simades.ksm.web.id
+    service: http://localhost:9004
+  - service: http_status:404

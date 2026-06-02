@@ -42,14 +42,22 @@ async function connectToWhatsApp() {
             connectedNumber = null;
             const shouldReconnect = lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
             console.log('connection closed due to ', lastDisconnect.error, ', reconnecting ', shouldReconnect);
-            
+
             if (shouldReconnect) {
                 connectionStatus = 'connecting';
                 connectToWhatsApp();
             } else {
-                connectionStatus = 'logged_out';
-                fs.rmSync('auth_info_baileys', { recursive: true, force: true });
-                console.log('Logged out. Please restart the app or scan QR again to reconnect.');
+                // Only delete auth folder if we were previously connected
+                if (connectionStatus === 'connected') {
+                    connectionStatus = 'logged_out';
+                    try {
+                        fs.rmSync('auth_info_baileys', { recursive: true, force: true });
+                        fs.rmSync('sessions', { recursive: true, force: true });
+                    } catch (e) {
+                        console.log('Could not remove auth folder:', e.code);
+                    }
+                    console.log('Logged out. Please restart the app or scan QR again to reconnect.');
+                }
                 connectToWhatsApp();
             }
         } else if (connection === 'open') {

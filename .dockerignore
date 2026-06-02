@@ -1,0 +1,6 @@
+mysql_data
+storage
+.env
+.git
+node_modules
+vendor
