@@ -33,6 +33,12 @@ class RiwayatController extends Controller
 
         $chartData = $this->tagihanService->getRiwayat6Bulan($idPelanggan);
 
-        return view('warga.riwayat', compact('riwayat', 'chartData'));
+        try {
+            $tarif = $this->tagihanService->getTarif();
+        } catch (\Throwable) {
+            $tarif = null;
+        }
+
+        return view('warga.riwayat', compact('riwayat', 'chartData', 'tarif'));
     }
 }

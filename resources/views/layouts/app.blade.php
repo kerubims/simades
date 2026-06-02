@@ -224,15 +224,22 @@
         @yield('content')
     </main>
 
-    <footer class="bg-surface-container-highest mt-auto">
-        <div class="w-full px-4 py-6 flex flex-col md:flex-row justify-between items-center gap-4 max-w-7xl mx-auto">
-            <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-primary fill-icon">water_drop</span>
-                <span class="font-bold text-primary">SIMADES</span>
+    <footer class="bg-surface-container-low mt-auto">
+        <div class="w-full px-4 py-lg flex flex-col md:flex-row justify-between items-center gap-md max-w-7xl mx-auto">
+            <div class="flex items-center gap-sm">
+                <span class="material-symbols-outlined text-primary fill-icon text-2xl">home</span>
+                <span class="font-headline-sm font-bold text-primary">Dusun Tambak</span>
             </div>
-            <p class="text-sm text-on-surface-variant text-center">
-                &copy; {{ date('Y') }} SIMADES. Sistem Informasi Manajemen Air Desa.
+            <p class="font-body-md text-body-md text-on-surface text-center md:text-left">
+                &copy; {{ date('Y') }} Dusun Tambak RT/RW 01/09. Desa Lemahbang.
             </p>
+            <div class="flex flex-wrap justify-center gap-md font-body-md text-body-md">
+                <a class="text-on-surface-variant hover:underline decoration-primary focus:ring-2 focus:ring-primary rounded flex items-center gap-2"
+                   href="mailto:kantor.desa@lemahbang.id">
+                    <span class="material-symbols-outlined text-sm">mail</span>
+                    kantor.desa@lemahbang.id
+                </a>
+            </div>
         </div>
     </footer>
 @endif
