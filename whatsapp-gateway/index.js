@@ -40,25 +40,47 @@ async function connectToWhatsApp() {
         if (connection === 'close') {
             qrCodeData = null;
             connectedNumber = null;
-            const shouldReconnect = lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
-            console.log('connection closed due to ', lastDisconnect.error, ', reconnecting ', shouldReconnect);
+            
+            const statusCode = lastDisconnect.error?.output?.statusCode;
+            const isLoggedOut = statusCode === DisconnectReason.loggedOut;
+            const shouldReconnect = !isLoggedOut;
+            
+            console.log('Connection closed. Status code:', statusCode, 'Reconnecting:', shouldReconnect);
 
             if (shouldReconnect) {
                 connectionStatus = 'connecting';
-                connectToWhatsApp();
+                // Wait a bit before reconnecting to avoid spamming
+                setTimeout(connectToWhatsApp, 3000);
             } else {
-                // Only delete auth folder if we were previously connected
-                if (connectionStatus === 'connected') {
-                    connectionStatus = 'logged_out';
+                connectionStatus = 'logged_out';
+                console.log('Logged out detected. Clearing credentials and preparing for new QR scan...');
+                
+                // Clean up old socket event listeners to avoid duplicates and leaks
+                if (sock) {
                     try {
-                        fs.rmSync('auth_info_baileys', { recursive: true, force: true });
-                        fs.rmSync('sessions', { recursive: true, force: true });
-                    } catch (e) {
-                        console.log('Could not remove auth folder:', e.code);
+                        sock.ev.removeAllListeners('connection.update');
+                        sock.ev.removeAllListeners('creds.update');
+                    } catch (err) {
+                        console.log('Error removing listeners:', err.message);
                     }
-                    console.log('Logged out. Please restart the app or scan QR again to reconnect.');
                 }
-                connectToWhatsApp();
+
+                // Wait 1.5 seconds to allow Baileys to release file locks on Windows/Linux
+                setTimeout(() => {
+                    try {
+                        if (fs.existsSync('auth_info_baileys')) {
+                            fs.rmSync('auth_info_baileys', { recursive: true, force: true });
+                        }
+                        if (fs.existsSync('sessions')) {
+                            fs.rmSync('sessions', { recursive: true, force: true });
+                        }
+                        console.log('Auth credentials cleared successfully.');
+                    } catch (e) {
+                        console.log('Could not remove auth folder:', e.message);
+                    }
+                    // Reinitialize a clean socket which will generate a new QR code
+                    connectToWhatsApp();
+                }, 1500);
             }
         } else if (connection === 'open') {
             console.log('opened connection');
