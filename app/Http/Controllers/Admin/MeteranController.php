@@ -8,6 +8,7 @@ use App\Services\PelangganService;
 use App\Services\TagihanService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class MeteranController extends Controller
@@ -33,12 +34,12 @@ class MeteranController extends Controller
 
         $meterAwalMap = [];
         foreach ($pelangganList as $p) {
-            if (!isset($tagihanMap[$p->idPelanggan])) {
+            if (! isset($tagihanMap[$p->idPelanggan])) {
                 $meterAwalMap[$p->idPelanggan] = $this->tagihanService->getMeterAwalTerakhir($p->idPelanggan, $bulan, $tahun);
             }
         }
 
-        $processingMap = \Illuminate\Support\Facades\Cache::get("processing_meter_{$bulan}_{$tahun}", []);
+        $processingMap = Cache::get("processing_meter_{$bulan}_{$tahun}", []);
 
         return view('admin.meteran.index', compact('pelangganList', 'tagihanMap', 'meterAwalMap', 'processingMap', 'bulan', 'tahun'));
     }
@@ -71,22 +72,21 @@ class MeteranController extends Controller
             return back()->with('error', "Tagihan untuk {$pelanggan->namaLengkap} periode ini sudah ada.");
         }
 
-        // Dispatch job ke background queue (tanpa kirim WA - WA dikirim saat lunas)
+        // Dispatch job ke background queue
         SimpanTagihanJob::dispatch(
             pelanggan: $pelanggan,
             meterAkhir: (int) $validated['meter_akhir'],
             bulan: (int) $validated['bulan'],
             tahun: (int) $validated['tahun'],
-            kirimWhatsapp: false,
             meterAwalOverride: isset($validated['meter_awal']) ? (int) $validated['meter_awal'] : null,
         );
 
         // Optimistic UI cache
-        $processingMap = \Illuminate\Support\Facades\Cache::get("processing_meter_{$validated['bulan']}_{$validated['tahun']}", []);
+        $processingMap = Cache::get("processing_meter_{$validated['bulan']}_{$validated['tahun']}", []);
         $processingMap[$pelanggan->idPelanggan] = [
             'meter_akhir' => (int) $validated['meter_akhir'],
         ];
-        \Illuminate\Support\Facades\Cache::put("processing_meter_{$validated['bulan']}_{$validated['tahun']}", $processingMap, 60);
+        Cache::put("processing_meter_{$validated['bulan']}_{$validated['tahun']}", $processingMap, 60);
 
         return back()->with('success', "Meteran {$pelanggan->namaLengkap} berhasil disimpan. Tagihan sedang diproses.");
     }
@@ -109,7 +109,7 @@ class MeteranController extends Controller
 
         foreach ($validated['meteran'] as $item) {
             // Lewati jika form meteran ini tidak diisi (kosong)
-            if (!isset($item['meter_akhir']) || $item['meter_akhir'] === null) {
+            if (! isset($item['meter_akhir']) || $item['meter_akhir'] === null) {
                 continue;
             }
             $pelanggan = $this->pelangganService->findById($item['id_pelanggan']);
@@ -133,7 +133,6 @@ class MeteranController extends Controller
                 meterAkhir: (int) $item['meter_akhir'],
                 bulan: (int) $validated['bulan'],
                 tahun: (int) $validated['tahun'],
-                kirimWhatsapp: false,
                 meterAwalOverride: isset($item['meter_awal']) ? (int) $item['meter_awal'] : null,
             );
 
@@ -141,14 +140,16 @@ class MeteranController extends Controller
         }
 
         if ($dispatched > 0) {
-            $processingMap = \Illuminate\Support\Facades\Cache::get("processing_meter_{$validated['bulan']}_{$validated['tahun']}", []);
+            $processingMap = Cache::get("processing_meter_{$validated['bulan']}_{$validated['tahun']}", []);
             foreach ($validated['meteran'] as $item) {
-                if (!isset($item['meter_akhir']) || $item['meter_akhir'] === null) continue;
+                if (! isset($item['meter_akhir']) || $item['meter_akhir'] === null) {
+                    continue;
+                }
                 $processingMap[$item['id_pelanggan']] = [
                     'meter_akhir' => (int) $item['meter_akhir'],
                 ];
             }
-            \Illuminate\Support\Facades\Cache::put("processing_meter_{$validated['bulan']}_{$validated['tahun']}", $processingMap, 60);
+            Cache::put("processing_meter_{$validated['bulan']}_{$validated['tahun']}", $processingMap, 60);
         }
 
         return redirect()->route('admin.meteran.index', ['bulan' => $validated['bulan'], 'tahun' => $validated['tahun']])

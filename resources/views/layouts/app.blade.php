@@ -42,13 +42,12 @@
         <nav class="flex-1 py-4 overflow-y-auto overflow-x-hidden">
             @php
                 $navItems = [
-                    ['route' => 'admin.dashboard',             'match' => 'admin.dashboard',     'icon' => 'dashboard',    'label' => 'Dashboard'],
-                    ['route' => 'admin.pelanggan.index',       'match' => 'admin.pelanggan.*',   'icon' => 'group',        'label' => 'Pelanggan'],
-                    ['route' => 'admin.meteran.index',         'match' => 'admin.meteran.*',     'icon' => 'speed',        'label' => 'Catat Meteran'],
-                    ['route' => 'admin.tagihan.index',         'match' => 'admin.tagihan.*',     'icon' => 'receipt_long', 'label' => 'Tagihan'],
-                    ['route' => 'admin.tarif.index',           'match' => 'admin.tarif.*',       'icon' => 'price_change', 'label' => 'Tarif Air'],
-                    ['route' => 'admin.qris.index',            'match' => 'admin.qris.*',        'icon' => 'qr_code_2',   'label' => 'QRIS Pembayaran'],
-                    ['route' => 'admin.pengaturan.gateway-wa', 'match' => 'admin.pengaturan.*', 'icon' => 'phone_iphone', 'label' => 'Gateway WA'],
+                    ['route' => 'admin.dashboard',       'match' => 'admin.dashboard',     'icon' => 'dashboard',    'label' => 'Dashboard'],
+                    ['route' => 'admin.pelanggan.index', 'match' => 'admin.pelanggan.*',   'icon' => 'group',        'label' => 'Pelanggan'],
+                    ['route' => 'admin.meteran.index',   'match' => 'admin.meteran.*',     'icon' => 'speed',        'label' => 'Catat Meteran'],
+                    ['route' => 'admin.tagihan.index',   'match' => 'admin.tagihan.*',     'icon' => 'receipt_long', 'label' => 'Tagihan'],
+                    ['route' => 'admin.tarif.index',     'match' => 'admin.tarif.*',       'icon' => 'price_change', 'label' => 'Tarif Air'],
+                    ['route' => 'admin.qris.index',      'match' => 'admin.qris.*',        'icon' => 'qr_code_2',   'label' => 'QRIS Pembayaran'],
                 ];
             @endphp
 

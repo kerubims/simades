@@ -3,7 +3,6 @@
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\MeteranController;
 use App\Http\Controllers\Admin\PelangganController;
-use App\Http\Controllers\Admin\PengaturanController;
 use App\Http\Controllers\Admin\QrisController;
 use App\Http\Controllers\Admin\TagihanController;
 use App\Http\Controllers\Admin\TarifController;
@@ -47,18 +46,10 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin'])->group(functi
     Route::get('/tagihan', [TagihanController::class, 'index'])->name('tagihan.index');
     Route::patch('/tagihan/{idTagihan}/lunas', [TagihanController::class, 'tandaiLunas'])->name('tagihan.lunas');
     Route::post('/tagihan/{idTagihan}/tolak', [TagihanController::class, 'tolakPembayaran'])->name('tagihan.tolak');
-    Route::post('/tagihan/{idTagihan}/kirim-wa', [TagihanController::class, 'kirimUlangWa'])->name('tagihan.kirim-wa');
-    Route::post('/tagihan/broadcast', [TagihanController::class, 'broadcastBelumBayar'])->name('tagihan.broadcast');
 
     // Tarif
     Route::get('/tarif', [TarifController::class, 'index'])->name('tarif.index');
     Route::put('/tarif', [TarifController::class, 'update'])->name('tarif.update');
-
-    // Pengaturan Gateway WhatsApp
-    Route::get('/pengaturan/gateway-wa', [PengaturanController::class, 'gatewayWa'])->name('pengaturan.gateway-wa');
-    Route::get('/pengaturan/gateway-wa/qr', [PengaturanController::class, 'getQrCode'])->name('pengaturan.qr');
-    Route::get('/pengaturan/gateway-wa/status', [PengaturanController::class, 'getStatus'])->name('pengaturan.status');
-    Route::post('/pengaturan/gateway-wa/logout', [PengaturanController::class, 'logout'])->name('pengaturan.logout');
 
     // QRIS Pembayaran
     Route::get('/qris', [QrisController::class, 'index'])->name('qris.index');

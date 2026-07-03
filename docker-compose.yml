@@ -56,20 +56,6 @@ services:
       timeout: 5s
       retries: 5
 
-  whatsapp:
-    build:
-      context: ./whatsapp-gateway
-      dockerfile: Dockerfile
-    container_name: simades-whatsapp
-    restart: unless-stopped
-    ports:
-      - "9005:3001"
-    volumes:
-      - ./whatsapp-gateway/sessions:/app/sessions
-      - ./whatsapp-gateway/auth_info_baileys:/app/auth_info_baileys
-    networks:
-      - simades-network
-
 networks:
   simades-network:
     driver: bridge

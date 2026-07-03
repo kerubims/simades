@@ -40,8 +40,4 @@ return [
         'service_account_json' => env('GOOGLE_SERVICE_ACCOUNT_JSON', 'credential/sistem-air-desa-40d161eaa72b.json'),
     ],
 
-    'whatsapp' => [
-        'gateway_url' => env('WHATSAPP_GATEWAY_URL', 'http://localhost:3001'),
-    ],
-
 ];
