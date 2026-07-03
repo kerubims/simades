@@ -75,6 +75,10 @@
                                 <span class="px-2 py-1 bg-[#dcfce7] text-[#166534] text-xs font-bold rounded-full flex items-center w-fit gap-1">
                                     <span class="material-symbols-outlined text-[14px] fill-icon">check_circle</span> Lunas
                                 </span>
+                            @elseif($t->isMenungguKonfirmasi())
+                                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full flex items-center w-fit gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">hourglass_empty</span> Menunggu Konfirmasi
+                                </span>
                             @else
                                 <span class="px-2 py-1 bg-[#fef3c7] text-[#b45309] text-xs font-bold rounded-full flex items-center w-fit gap-1">
                                     <span class="material-symbols-outlined text-[14px]">schedule</span> Belum Bayar
@@ -82,9 +86,15 @@
                             @endif
                         </td>
                         <td class="p-4 text-center">
-                            @if(!$t->isSudahLunas())
+                            @if($t->isMenungguKonfirmasi())
+                                <button type="button" onclick="openVerifikasiModal('{{ $t->idTagihan }}', '{{ Storage::url($t->buktiPembayaran) }}')"
+                                    class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:opacity-90 transition-opacity">
+                                    <span class="material-symbols-outlined text-[14px]">visibility</span>
+                                    Cek Bukti
+                                </button>
+                            @elseif(!$t->isSudahLunas())
                                 <form action="{{ route('admin.tagihan.lunas', $t->idTagihan) }}" method="POST"
-                                    onsubmit="return confirm('Tandai tagihan {{ $t->idTagihan }} sebagai lunas?');">
+                                    onsubmit="return confirm('Tandai tagihan {{ $t->idTagihan }} sebagai lunas secara manual?');">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit"
@@ -151,6 +161,63 @@
     </div>
 </div>
 @endif
+
+{{-- ===== MODAL VERIFIKASI BUKTI ===== --}}
+<div id="verifikasi-modal"
+     class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden"
+     aria-modal="true" role="dialog" aria-labelledby="verifikasi-modal-title">
+
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"
+         onclick="closeVerifikasiModal()"></div>
+
+    <div class="relative bg-surface rounded-2xl shadow-2xl w-full max-w-lg mx-auto z-10 overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="bg-primary px-6 py-4 flex items-center justify-between shrink-0">
+            <h3 id="verifikasi-modal-title" class="text-on-primary font-bold text-lg flex items-center gap-2">
+                <span class="material-symbols-outlined text-[22px]">visibility</span>
+                Verifikasi Bukti Pembayaran
+            </h3>
+            <button onclick="closeVerifikasiModal()"
+                    class="text-on-primary/70 hover:text-on-primary transition-colors rounded-lg p-1">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto">
+            <div class="mb-4">
+                <a id="verifikasi-img-link" href="#" target="_blank" class="block w-full bg-surface-container rounded-xl border border-outline-variant/30 flex justify-center items-center overflow-hidden h-64 hover:bg-surface-container-high transition-colors">
+                    <img id="verifikasi-img" src="" alt="Bukti Pembayaran" class="max-w-full max-h-full object-contain hidden">
+                    <span id="verifikasi-pdf-icon" class="material-symbols-outlined text-6xl text-primary hidden">picture_as_pdf</span>
+                </a>
+                <p class="text-xs text-center text-on-surface-variant mt-2">Klik gambar/area di atas untuk melihat resolusi penuh.</p>
+            </div>
+
+            <div class="flex gap-4">
+                <form id="form-terima" method="POST" action="" class="w-1/2">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" onclick="return confirm('Konfirmasi tagihan ini lunas?');" class="w-full py-2.5 rounded-xl bg-green-600 text-white font-bold hover:bg-green-700 transition-colors flex justify-center items-center gap-2">
+                        <span class="material-symbols-outlined">check_circle</span> Terima & Lunas
+                    </button>
+                </form>
+                <div class="w-1/2 relative">
+                    <button type="button" onclick="toggleTolakForm()" class="w-full py-2.5 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 transition-colors flex justify-center items-center gap-2">
+                        <span class="material-symbols-outlined">cancel</span> Tolak
+                    </button>
+                </div>
+            </div>
+
+            <div id="form-tolak-container" class="mt-4 p-4 border border-red-200 bg-red-50 rounded-xl hidden">
+                <form id="form-tolak" method="POST" action="">
+                    @csrf
+                    <label class="block text-sm font-semibold text-red-800 mb-1">Alasan Penolakan</label>
+                    <textarea name="alasan_penolakan" rows="2" required class="w-full rounded-lg border-red-300 focus:ring-red-500 focus:border-red-500 text-sm mb-2" placeholder="Contoh: Gambar buram atau nominal tidak sesuai..."></textarea>
+                    <button type="submit" onclick="return confirm('Tolak pembayaran ini dan beritahu warga?');" class="w-full py-2 rounded-lg bg-red-600 text-white font-bold text-sm hover:bg-red-700">Kirim Penolakan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
@@ -163,7 +230,6 @@ function openQrisModal() {
     const modal = document.getElementById('qris-modal');
     if (modal) {
         modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
     }
 }
 
@@ -171,12 +237,49 @@ function closeQrisModal() {
     const modal = document.getElementById('qris-modal');
     if (modal) {
         modal.classList.add('hidden');
-        document.body.style.overflow = '';
     }
 }
 
+function openVerifikasiModal(idTagihan, buktiUrl) {
+    const modal = document.getElementById('verifikasi-modal');
+    
+    const img = document.getElementById('verifikasi-img');
+    const pdfIcon = document.getElementById('verifikasi-pdf-icon');
+    const link = document.getElementById('verifikasi-img-link');
+    
+    link.href = buktiUrl;
+    if(buktiUrl.toLowerCase().endsWith('.pdf')) {
+        img.classList.add('hidden');
+        pdfIcon.classList.remove('hidden');
+    } else {
+        img.src = buktiUrl;
+        img.classList.remove('hidden');
+        pdfIcon.classList.add('hidden');
+    }
+
+    document.getElementById('form-terima').action = `/admin/tagihan/${idTagihan}/lunas`;
+    document.getElementById('form-tolak').action = `/admin/tagihan/${idTagihan}/tolak`;
+    
+    document.getElementById('form-tolak-container').classList.add('hidden');
+    document.getElementById('form-tolak').reset();
+
+    modal.classList.remove('hidden');
+}
+
+function closeVerifikasiModal() {
+    document.getElementById('verifikasi-modal').classList.add('hidden');
+}
+
+function toggleTolakForm() {
+    const container = document.getElementById('form-tolak-container');
+    container.classList.toggle('hidden');
+}
+
 document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeQrisModal();
+    if (e.key === 'Escape') {
+        closeQrisModal();
+        closeVerifikasiModal();
+    }
 });
 </script>
 @endsection

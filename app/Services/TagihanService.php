@@ -56,6 +56,22 @@ class TagihanService
     }
 
     /**
+     * Ambil tagihan berdasarkan ID.
+     */
+    public function findById(string $idTagihan): ?TagihanData
+    {
+        $rows = $this->sheets->getSheet('transaksi_tagihan');
+
+        foreach ($rows as $index => $row) {
+            if (($row['id_tagihan'] ?? '') === $idTagihan) {
+                return TagihanData::fromSheetRow($row, $index + 2);
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Ambil tagihan bulan & tahun tertentu.
      *
      * @return array<int, TagihanData>
@@ -167,6 +183,14 @@ class TagihanService
         }
 
         return $success ? $tagihan : null;
+    }
+
+    /**
+     * Update data tagihan secara penuh.
+     */
+    public function updateTagihan(TagihanData $tagihan): bool
+    {
+        return $this->sheets->updateRow('transaksi_tagihan', $tagihan->rowIndex, $tagihan->toSheetRow());
     }
 
     /**

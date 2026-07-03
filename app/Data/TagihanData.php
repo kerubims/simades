@@ -15,6 +15,8 @@ class TagihanData
         public int $totalTagihan,
         public string $statusBayar,
         public string $linkPdf,
+        public ?string $buktiPembayaran = null,
+        public ?string $alasanPenolakan = null,
         public int $rowIndex = 0,
     ) {}
 
@@ -34,8 +36,15 @@ class TagihanData
             totalTagihan: (int) ($row['total_tagihan'] ?? 0),
             statusBayar: $row['status_bayar'] ?? 'Belum Bayar',
             linkPdf: $row['link_pdf'] ?? '',
+            buktiPembayaran: $row['bukti_pembayaran'] ?? null,
+            alasanPenolakan: $row['alasan_penolakan'] ?? null,
             rowIndex: $rowIndex,
         );
+    }
+
+    public function isMenungguKonfirmasi(): bool
+    {
+        return $this->statusBayar === 'Menunggu Konfirmasi';
     }
 
     public function isSudahLunas(): bool
@@ -70,6 +79,8 @@ class TagihanData
             'total_tagihan' => (string) $this->totalTagihan,
             'status_bayar' => $this->statusBayar,
             'link_pdf' => $this->linkPdf,
+            'bukti_pembayaran' => $this->buktiPembayaran ?? '',
+            'alasan_penolakan' => $this->alasanPenolakan ?? '',
         ];
     }
 }

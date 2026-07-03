@@ -46,6 +46,7 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin'])->group(functi
     // Tagihan & Pembayaran
     Route::get('/tagihan', [TagihanController::class, 'index'])->name('tagihan.index');
     Route::patch('/tagihan/{idTagihan}/lunas', [TagihanController::class, 'tandaiLunas'])->name('tagihan.lunas');
+    Route::post('/tagihan/{idTagihan}/tolak', [TagihanController::class, 'tolakPembayaran'])->name('tagihan.tolak');
     Route::post('/tagihan/{idTagihan}/kirim-wa', [TagihanController::class, 'kirimUlangWa'])->name('tagihan.kirim-wa');
     Route::post('/tagihan/broadcast', [TagihanController::class, 'broadcastBelumBayar'])->name('tagihan.broadcast');
 
@@ -75,4 +76,7 @@ Route::prefix('warga')->name('warga.')->middleware(['role:warga'])->group(functi
 
     // Download slip PDF
     Route::get('/slip/{idTagihan}/download', [SlipController::class, 'download'])->name('slip.download');
+
+    // Upload Bukti Pembayaran
+    Route::post('/tagihan/{idTagihan}/upload-bukti', [WargaDashboardController::class, 'uploadBukti'])->name('tagihan.upload');
 });

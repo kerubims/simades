@@ -27,26 +27,16 @@ class SlipController extends Controller
             }
 
             // Cari tagihan milik pelanggan ini
-            $semuaTagihan = $this->tagihanService->getByPelanggan($idPelanggan);
-            $tagihan = null;
+            $tagihan = $this->tagihanService->findById($idTagihan);
 
-            foreach ($semuaTagihan as $t) {
-                if ($t->idTagihan === $idTagihan) {
-                    $tagihan = $t;
-                    break;
-                }
-            }
-
-            if ($tagihan === null) {
-                return redirect()->route('warga.riwayat')
-                    ->with('error', 'Slip tagihan tidak ditemukan.');
+            if ($tagihan === null || $tagihan->idPelanggan !== $idPelanggan) {
+                return back()->with('error', 'Slip tagihan tidak ditemukan.');
             }
 
             $pelanggan = $this->pelangganService->findById($idPelanggan);
 
             if ($pelanggan === null) {
-                return redirect()->route('warga.riwayat')
-                    ->with('error', 'Data pelanggan tidak ditemukan.');
+                return back()->with('error', 'Data pelanggan tidak ditemukan.');
             }
 
             $tarif = $this->tagihanService->getTarif();
@@ -54,13 +44,12 @@ class SlipController extends Controller
             $pdf = Pdf::loadView('pdf.slip_tagihan', compact('tagihan', 'pelanggan', 'tarif'))
                 ->setPaper('a5', 'portrait');
 
-            return $pdf->stream("slip-tagihan-{$tagihan->idTagihan}.pdf");
+            return $pdf->download("slip-tagihan-{$tagihan->idTagihan}.pdf");
 
         } catch (Throwable $e) {
             report($e);
 
-            return redirect()->route('warga.riwayat')
-                ->with('error', 'Gagal mengunduh slip: '.$e->getMessage());
+            return back()->with('error', 'Gagal mengunduh slip: '.$e->getMessage());
         }
     }
 }

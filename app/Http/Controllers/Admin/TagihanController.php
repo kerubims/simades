@@ -53,7 +53,10 @@ class TagihanController extends Controller
             return back()->with('error', 'Tagihan tidak ditemukan.');
         }
 
-        $success = $this->tagihanService->tandaiLunas($tagihan);
+        $tagihan->statusBayar = 'Lunas';
+        $tagihan->alasanPenolakan = null;
+
+        $success = $this->tagihanService->updateTagihan($tagihan);
 
         if (! $success) {
             return back()->with('error', 'Gagal update status pembayaran.');
@@ -66,6 +69,43 @@ class TagihanController extends Controller
         }
 
         return back()->with('success', 'Tagihan berhasil ditandai lunas. Slip bukti sedang dikirim ke WhatsApp warga.');
+    }
+
+    public function tolakPembayaran(Request $request, string $idTagihan): RedirectResponse
+    {
+        $request->validate([
+            'alasan_penolakan' => 'required|string|max:255',
+        ]);
+
+        $semuaTagihan = $this->tagihanService->getAll();
+        $tagihan = null;
+
+        foreach ($semuaTagihan as $t) {
+            if ($t->idTagihan === $idTagihan) {
+                $tagihan = $t;
+                break;
+            }
+        }
+
+        if ($tagihan === null) {
+            return back()->with('error', 'Tagihan tidak ditemukan.');
+        }
+
+        if ($tagihan->buktiPembayaran) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($tagihan->buktiPembayaran);
+        }
+
+        $tagihan->statusBayar = 'Belum Bayar';
+        $tagihan->buktiPembayaran = null;
+        $tagihan->alasanPenolakan = $request->input('alasan_penolakan');
+
+        $success = $this->tagihanService->updateTagihan($tagihan);
+
+        if (! $success) {
+            return back()->with('error', 'Gagal menolak pembayaran.');
+        }
+
+        return back()->with('success', 'Pembayaran berhasil ditolak. Warga dapat mengunggah bukti baru.');
     }
 
     /**
