@@ -199,7 +199,7 @@ class GoogleSheetsService
         $rows = $this->getSheet($sheetName);
 
         foreach ($rows as $index => $row) {
-            if (isset($row[$column]) && $row[$column] === $value) {
+            if (isset($row[$column]) && trim((string) $row[$column]) === trim((string) $value)) {
                 return [
                     'data' => $row,
                     'rowIndex' => $index + 2, // +2 karena baris 1 = header, index 0 = baris 2
