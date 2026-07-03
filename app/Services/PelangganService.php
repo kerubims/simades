@@ -118,6 +118,25 @@ class PelangganService
     }
 
     /**
+     * Update password user.
+     */
+    public function updateUserPassword(string $idUser, string $newPassword): bool
+    {
+        $user = $this->findUserByIdUser($idUser);
+
+        if ($user === null) {
+            return false;
+        }
+
+        return $this->sheets->updateRow('users', $user->rowIndex, [
+            'id_user' => $user->idUser,
+            'username' => $user->username,
+            'password' => bcrypt($newPassword),
+            'role' => $user->role,
+        ]);
+    }
+
+    /**
      * Nonaktifkan pelanggan (soft delete).
      */
     public function deactivate(PelangganData $pelanggan): bool

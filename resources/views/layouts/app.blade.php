@@ -47,6 +47,7 @@
                     ['route' => 'admin.meteran.index',         'match' => 'admin.meteran.*',     'icon' => 'speed',        'label' => 'Catat Meteran'],
                     ['route' => 'admin.tagihan.index',         'match' => 'admin.tagihan.*',     'icon' => 'receipt_long', 'label' => 'Tagihan'],
                     ['route' => 'admin.tarif.index',           'match' => 'admin.tarif.*',       'icon' => 'price_change', 'label' => 'Tarif Air'],
+                    ['route' => 'admin.qris.index',            'match' => 'admin.qris.*',        'icon' => 'qr_code_2',   'label' => 'QRIS Pembayaran'],
                     ['route' => 'admin.pengaturan.gateway-wa', 'match' => 'admin.pengaturan.*', 'icon' => 'phone_iphone', 'label' => 'Gateway WA'],
                 ];
             @endphp
@@ -146,7 +147,7 @@
                 ['route' => 'admin.pelanggan.index', 'match' => 'admin.pelanggan.*', 'icon' => 'group',        'label' => 'Pelanggan'],
                 ['route' => 'admin.meteran.index',   'match' => 'admin.meteran.*',   'icon' => 'speed',        'label' => 'Meteran'],
                 ['route' => 'admin.tagihan.index',   'match' => 'admin.tagihan.*',   'icon' => 'receipt_long', 'label' => 'Tagihan'],
-                ['route' => 'admin.tarif.index',     'match' => 'admin.tarif.*',     'icon' => 'price_change', 'label' => 'Lainnya'],
+                ['route' => 'admin.qris.index',      'match' => 'admin.qris.*',      'icon' => 'qr_code_2',   'label' => 'QRIS'],
             ];
         @endphp
         @foreach($mobileNavItems as $item)
@@ -224,7 +225,7 @@
         @yield('content')
     </main>
 
-    <footer class="bg-surface-container-low mt-auto">
+    <footer class="bg-surface-container-low mt-auto pb-16 md:pb-0">
         <div class="w-full px-4 py-lg flex flex-col md:flex-row justify-between items-center gap-md max-w-7xl mx-auto">
             <div class="flex items-center gap-sm">
                 <span class="material-symbols-outlined text-primary fill-icon text-2xl">home</span>
@@ -242,8 +243,30 @@
             </div>
         </div>
     </footer>
+
+    {{-- Mobile bottom navigation for Warga --}}
+    @if(session('user_id'))
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-surface border-t border-outline-variant/20 flex shadow-lg">
+        @php
+            $wargaNavItems = [
+                ['route' => 'warga.dashboard', 'match' => 'warga.dashboard', 'icon' => 'dashboard', 'label' => 'Dashboard'],
+                ['route' => 'warga.riwayat',   'match' => 'warga.riwayat',   'icon' => 'receipt_long', 'label' => 'Tagihan'],
+            ];
+        @endphp
+        @foreach($wargaNavItems as $item)
+            @php $isActive = request()->routeIs($item['match']); @endphp
+            <a href="{{ route($item['route']) }}"
+               class="flex-1 flex flex-col items-center justify-center py-2 gap-0.5 text-[10px] font-semibold transition-colors
+                   {{ $isActive ? 'text-primary' : 'text-on-surface-variant' }}">
+                <span class="material-symbols-outlined text-[22px] {{ $isActive ? 'fill-icon' : '' }}">{{ $item['icon'] }}</span>
+                <span>{{ $item['label'] }}</span>
+            </a>
+        @endforeach
+    </nav>
+    @endif
 @endif
 
-@yield('scripts')
+    <script src="{{ asset('js/pagination.js') }}?v={{ time() }}"></script>
+    @yield('scripts')
 </body>
 </html>

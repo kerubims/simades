@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Warga;
 
 use App\Http\Controllers\Controller;
 use App\Services\TagihanService;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class RiwayatController extends Controller
@@ -39,6 +40,9 @@ class RiwayatController extends Controller
             $tarif = null;
         }
 
-        return view('warga.riwayat', compact('riwayat', 'chartData', 'tarif'));
+        $qrisPath = $this->tagihanService->getQrisPath();
+        $qrisUrl = $qrisPath ? Storage::disk('public')->url($qrisPath) : null;
+
+        return view('warga.riwayat', compact('riwayat', 'chartData', 'tarif', 'qrisUrl'));
     }
 }

@@ -104,12 +104,17 @@ class PelangganController extends Controller
             'rw' => ['required', 'string', 'max:5'],
             'no_whatsapp' => ['required', 'string', 'regex:/^628[0-9]{8,12}$/'],
             'status_aktif' => ['required', 'in:Aktif,Non-Aktif'],
+            'password' => ['nullable', 'string', 'min:6'],
         ]);
 
         $success = $this->pelangganService->update($pelanggan, $validated);
 
         if (! $success) {
             return back()->withInput()->with('error', 'Gagal update pelanggan.');
+        }
+
+        if (!empty($validated['password'])) {
+            $this->pelangganService->updateUserPassword($pelanggan->idUser, $validated['password']);
         }
 
         return redirect()->route('admin.pelanggan.index')

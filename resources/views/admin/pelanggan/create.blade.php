@@ -21,7 +21,7 @@
             <input type="text" name="nama_lengkap" value="{{ old('nama_lengkap') }}" required class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary" />
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-semibold mb-1">NIK</label>
                 <input type="text" name="nik" value="{{ old('nik') }}" required class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary" />
@@ -32,7 +32,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-semibold mb-1">RT</label>
                 <input type="text" name="rt" value="{{ old('rt') }}" placeholder="Contoh: 01" required class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary" />
@@ -50,7 +50,7 @@
 
         <h3 class="font-bold border-b border-outline-variant/30 pb-2 text-primary mt-4">Akun Login Warga</h3>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-semibold mb-1">Username Login</label>
                 <input type="text" name="username" value="{{ old('username') }}" required class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary" />

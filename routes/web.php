@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\MeteranController;
 use App\Http\Controllers\Admin\PelangganController;
 use App\Http\Controllers\Admin\PengaturanController;
+use App\Http\Controllers\Admin\QrisController;
 use App\Http\Controllers\Admin\TagihanController;
 use App\Http\Controllers\Admin\TarifController;
 use App\Http\Controllers\AuthController;
@@ -57,6 +58,10 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin'])->group(functi
     Route::get('/pengaturan/gateway-wa/qr', [PengaturanController::class, 'getQrCode'])->name('pengaturan.qr');
     Route::get('/pengaturan/gateway-wa/status', [PengaturanController::class, 'getStatus'])->name('pengaturan.status');
     Route::post('/pengaturan/gateway-wa/logout', [PengaturanController::class, 'logout'])->name('pengaturan.logout');
+
+    // QRIS Pembayaran
+    Route::get('/qris', [QrisController::class, 'index'])->name('qris.index');
+    Route::post('/qris', [QrisController::class, 'store'])->name('qris.store');
 });
 
 // ── Warga Routes ─────────────────────────────────────────────────────────────

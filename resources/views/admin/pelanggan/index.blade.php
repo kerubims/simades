@@ -2,7 +2,7 @@
 @section('title', 'Data Pelanggan')
 
 @section('content')
-<div class="flex justify-between items-center mb-6">
+<div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
     <div>
         <h1 class="text-2xl font-bold text-on-surface">Data Pelanggan</h1>
         <p class="text-on-surface-variant">Kelola warga penerima layanan air bersih desa.</p>
@@ -16,8 +16,7 @@
     <div class="relative max-w-sm">
         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
         <input type="text" id="search-pelanggan" placeholder="Cari nama, NIK, atau no. pelanggan..."
-            class="w-full pl-10 pr-4 py-2 rounded-xl border border-outline-variant/40 bg-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-            oninput="filterTable('search-pelanggan', 'tbl-pelanggan')">
+            class="w-full pl-10 pr-4 py-2 rounded-xl border border-outline-variant/40 bg-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
     </div>
 </div>
 
@@ -81,12 +80,8 @@
 
 @section('scripts')
 <script>
-function filterTable(inputId, tbodyId) {
-    const q = document.getElementById(inputId).value.toLowerCase();
-    const rows = document.getElementById(tbodyId).querySelectorAll('tr');
-    rows.forEach(row => {
-        row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
-    });
-}
+document.addEventListener('DOMContentLoaded', () => {
+    new TablePagination('tbl-pelanggan', 'search-pelanggan');
+});
 </script>
 @endsection

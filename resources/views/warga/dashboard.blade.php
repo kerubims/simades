@@ -37,6 +37,13 @@
                         Status: {{ $tagihanBulanIni->statusBayar }}
                     </span>
                 </div>
+
+                @if($qrisUrl && !$tagihanBulanIni->isSudahLunas())
+                    <button type="button" onclick="openQrisModal()"
+                        class="flex justify-center items-center gap-2 bg-primary text-white py-3 rounded-lg hover:bg-primary/90 font-bold transition-colors shadow-md shadow-primary/20">
+                        <span class="material-symbols-outlined">qr_code_2</span> Bayar via QRIS
+                    </button>
+                @endif
                 
                 <a href="{{ route('warga.slip.download', $tagihanBulanIni->idTagihan) }}" class="flex justify-center items-center gap-2 bg-secondary text-white py-3 rounded-lg hover:bg-secondary/90 font-bold transition-colors">
                     <span class="material-symbols-outlined">download</span> Download Slip PDF
@@ -72,4 +79,72 @@
         </div>
     </div>
 </div>
+
+{{-- ===== MODAL QRIS PEMBAYARAN ===== --}}
+@if($qrisUrl)
+<div id="qris-modal"
+     class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden"
+     aria-modal="true" role="dialog" aria-labelledby="qris-modal-title">
+
+    {{-- Backdrop --}}
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"
+         onclick="closeQrisModal()"></div>
+
+    {{-- Panel --}}
+    <div class="relative bg-surface rounded-2xl shadow-2xl w-full max-w-sm mx-auto z-10 overflow-hidden">
+        {{-- Header --}}
+        <div class="bg-primary px-6 py-4 flex items-center justify-between">
+            <h3 id="qris-modal-title" class="text-on-primary font-bold text-lg flex items-center gap-2">
+                <span class="material-symbols-outlined text-[22px]">qr_code_2</span>
+                QRIS Pembayaran
+            </h3>
+            <button onclick="closeQrisModal()"
+                    class="text-on-primary/70 hover:text-on-primary transition-colors rounded-lg p-1"
+                    aria-label="Tutup">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        {{-- QRIS Image --}}
+        <div class="p-6">
+            <div class="bg-white rounded-xl p-4 border border-outline-variant/20 flex justify-center">
+                <img src="{{ $qrisUrl }}" alt="QRIS Pembayaran" class="max-w-full max-h-80 object-contain">
+            </div>
+            <p class="text-center text-sm text-on-surface-variant mt-4">Scan QR code di atas untuk melakukan pembayaran tagihan air.</p>
+        </div>
+
+        {{-- Close --}}
+        <div class="px-6 pb-6">
+            <button onclick="closeQrisModal()"
+                    class="w-full py-2.5 rounded-xl border border-outline-variant/40 text-on-surface-variant text-sm font-semibold hover:bg-surface-container transition-colors">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
+@endif
+@endsection
+
+@section('scripts')
+<script>
+    function openQrisModal() {
+        const modal = document.getElementById('qris-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeQrisModal() {
+        const modal = document.getElementById('qris-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+    }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeQrisModal();
+    });
+</script>
 @endsection

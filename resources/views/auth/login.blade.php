@@ -65,7 +65,14 @@
                 </button>
             </form>
             
-            <div class="mt-8 text-center">
+            <div class="mt-6 text-center">
+                <p class="text-sm text-on-surface-variant">
+                    Belum punya akun? 
+                    <a href="{{ route('register') }}" class="text-primary font-semibold hover:underline transition-colors">Daftar di sini</a>
+                </p>
+            </div>
+
+            <div class="mt-4 text-center">
                 <p class="text-xs text-on-surface-variant/70">&copy; {{ date('Y') }} Desa Digital. All rights reserved.</p>
             </div>
         </div>

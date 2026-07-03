@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Warga;
 use App\Http\Controllers\Controller;
 use App\Services\PelangganService;
 use App\Services\TagihanService;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -17,7 +18,7 @@ class DashboardController extends Controller
     public function index(): View
     {
         $idPelanggan = session('pelanggan_id');
-        
+
         if (! $idPelanggan) {
             abort(403, 'Data pelanggan Anda tidak ditemukan. Pastikan sinkronisasi data Admin dan Warga benar, lalu coba login ulang.');
         }
@@ -29,6 +30,9 @@ class DashboardController extends Controller
         $tagihanBulanIni = $this->tagihanService->getTagihanPelangganPeriode($idPelanggan, $bulan, $tahun);
         $tarif = $this->tagihanService->getTarif();
 
-        return view('warga.dashboard', compact('pelanggan', 'tagihanBulanIni', 'tarif'));
+        $qrisPath = $this->tagihanService->getQrisPath();
+        $qrisUrl = $qrisPath ? Storage::disk('public')->url($qrisPath) : null;
+
+        return view('warga.dashboard', compact('pelanggan', 'tagihanBulanIni', 'tarif', 'qrisUrl'));
     }
 }

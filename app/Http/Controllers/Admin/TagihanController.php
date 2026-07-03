@@ -31,7 +31,10 @@ class TagihanController extends Controller
             $pelangganMap[$p->idPelanggan] = $p;
         }
 
-        return view('admin.tagihan.index', compact('tagihanList', 'pelangganMap', 'bulan', 'tahun'));
+        $qrisPath = $this->tagihanService->getQrisPath();
+        $qrisUrl = $qrisPath ? \Illuminate\Support\Facades\Storage::disk('public')->url($qrisPath) : null;
+
+        return view('admin.tagihan.index', compact('tagihanList', 'pelangganMap', 'bulan', 'tahun', 'qrisUrl'));
     }
 
     public function tandaiLunas(string $idTagihan): RedirectResponse

@@ -20,7 +20,7 @@
             <input type="text" name="nama_lengkap" value="{{ old('nama_lengkap', $pelanggan->namaLengkap) }}" required class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary" />
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-semibold mb-1">NIK</label>
                 <input type="text" name="nik" value="{{ old('nik', $pelanggan->nik) }}" required class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary" />
@@ -31,7 +31,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-semibold mb-1">RT</label>
                 <input type="text" name="rt" value="{{ old('rt', $pelanggan->rt) }}" required class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary" />
@@ -48,12 +48,21 @@
             <p class="text-xs text-on-surface-variant mt-1">Bisa diawali 08 atau 628 (Sistem otomatis mengubah ke format API 62)</p>
         </div>
 
-        <div>
-            <label class="block text-sm font-semibold mb-1">Status Aktif</label>
-            <select name="status_aktif" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary">
-                <option value="Aktif" {{ $pelanggan->isAktif() ? 'selected' : '' }}>Aktif</option>
-                <option value="Non-Aktif" {{ !$pelanggan->isAktif() ? 'selected' : '' }}>Non-Aktif</option>
-            </select>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-semibold mb-1">Status Aktif</label>
+                <select name="status_aktif" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary">
+                    <option value="Aktif" {{ $pelanggan->isAktif() ? 'selected' : '' }}>Aktif</option>
+                    <option value="Non-Aktif" {{ !$pelanggan->isAktif() ? 'selected' : '' }}>Non-Aktif</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold mb-1">Password (Opsional)</label>
+                <input type="password" name="password" placeholder="Biarkan kosong jika tidak ingin mengubah" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary" />
+                @error('password')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
         </div>
 
         <div class="mt-6 flex justify-end gap-3">

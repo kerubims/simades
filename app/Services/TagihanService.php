@@ -140,7 +140,7 @@ class TagihanService
         $idTagihan = $this->generateIdTagihan($pelanggan->idPelanggan, $bulan, $tahun);
 
         $existing = $this->sheets->findRow('transaksi_tagihan', 'id_tagihan', $idTagihan);
-        
+
         $statusBayar = $existing ? ($existing['data']['status_bayar'] ?? 'Belum Bayar') : 'Belum Bayar';
         $linkPdfToSave = $linkPdf ?: ($existing ? ($existing['data']['link_pdf'] ?? '') : '');
 
@@ -273,6 +273,51 @@ class TagihanService
         $this->sheets->clearCache('pengaturan_tarif');
 
         return $ok1 && $ok2 && $ok3;
+    }
+
+    /**
+     * Ambil path QRIS dari Google Sheets.
+     */
+    public function getQrisPath(): ?string
+    {
+        $rows = $this->sheets->getSheet('pengaturan_tarif');
+
+        foreach ($rows as $row) {
+            if (strtolower($row['komponen'] ?? '') === 'qris_path') {
+                $path = $row['nominal'] ?? '';
+
+                return $path !== '' ? $path : null;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Simpan path QRIS ke Google Sheets.
+     */
+    public function saveQrisPath(string $path): bool
+    {
+        $rows = $this->sheets->getSheet('pengaturan_tarif');
+
+        foreach ($rows as $index => $row) {
+            if (strtolower($row['komponen'] ?? '') === 'qris_path') {
+                $rowIndex = $index + 2;
+                $success = $this->sheets->updateCell('pengaturan_tarif', "B{$rowIndex}", $path);
+                $this->sheets->clearCache('pengaturan_tarif');
+
+                return $success;
+            }
+        }
+
+        // Jika belum ada, append baris baru
+        $success = $this->sheets->appendRow('pengaturan_tarif', [
+            'komponen' => 'qris_path',
+            'nominal' => $path,
+        ]);
+        $this->sheets->clearCache('pengaturan_tarif');
+
+        return $success;
     }
 
     private function generateIdTagihan(string $idPelanggan, int $bulan, int $tahun): string

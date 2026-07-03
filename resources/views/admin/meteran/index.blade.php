@@ -9,7 +9,7 @@
 
 <!-- Filter Periode -->
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-    <form method="GET" action="{{ route('admin.meteran.index') }}" class="flex items-center gap-4 bg-surface p-4 rounded-xl border border-outline-variant/20 shadow-sm w-fit">
+    <form method="GET" action="{{ route('admin.meteran.index') }}" class="flex flex-col sm:flex-row sm:items-center gap-4 bg-surface p-4 rounded-xl border border-outline-variant/20 shadow-sm w-full md:w-fit">
         <div class="flex items-center gap-2">
             <label class="font-semibold text-sm">Bulan:</label>
             <select name="bulan" class="rounded-lg border-outline-variant py-1 text-sm">
@@ -32,8 +32,7 @@
     <div class="relative w-full md:w-80">
         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
         <input type="text" id="search-meteran" placeholder="Cari nama atau no. pelanggan..."
-            class="w-full pl-10 pr-4 py-2 rounded-xl border border-outline-variant/40 bg-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-            oninput="filterTable('search-meteran', 'tbl-meteran')">
+            class="w-full pl-10 pr-4 py-2 rounded-xl border border-outline-variant/40 bg-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
     </div>
 </div>
 
@@ -106,7 +105,7 @@
         </div>
 
         @if($idx > 0)
-            <div class="p-4 bg-surface-container-low border-t border-outline-variant/30 flex justify-end">
+            <div class="p-4 bg-surface-container-low border-t border-outline-variant/30 flex justify-center md:justify-end">
                 <button type="submit" class="bg-primary text-on-primary px-6 py-2 rounded-lg font-bold hover:opacity-90 flex items-center gap-2">
                     <span class="material-symbols-outlined">save</span> Simpan dan Generate Tagihan
                 </button>
@@ -131,12 +130,8 @@
 </script>
 @endif
 <script>
-function filterTable(inputId, tbodyId) {
-    const q = document.getElementById(inputId).value.toLowerCase();
-    const rows = document.getElementById(tbodyId).querySelectorAll('tr');
-    rows.forEach(row => {
-        row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
-    });
-}
+document.addEventListener('DOMContentLoaded', () => {
+    new TablePagination('tbl-meteran', 'search-meteran');
+});
 </script>
 @endsection

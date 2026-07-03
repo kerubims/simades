@@ -1,6 +1,6 @@
 # SIMADES - Sistem Informasi Manajemen Air Desa
 
-SIMADES adalah aplikasi sistem tagihan dan pengelolaan air bersih (BUMDes / Desa) berbasis Web. Sistem ini dibangun dengan teknologi modern yang menggunakan **Google Sheets** sebagai database utama (untuk kemudahan kolaborasi warga/perangkat desa) dan mengintegrasikan **WhatsApp Gateway Node.js** untuk pengiriman bukti slip pembayaran secara otomatis.
+SIMADES adalah aplikasi sistem tagihan dan pengelolaan air bersih desa berbasis Web. Sistem ini dibangun dengan teknologi modern yang menggunakan **Google Sheets** sebagai database utama (untuk kemudahan kolaborasi warga/perangkat desa) dan mengintegrasikan **WhatsApp Gateway Node.js** untuk pengiriman bukti slip pembayaran secara otomatis.
 
 ## 🛠️ Stack Teknologi
 
