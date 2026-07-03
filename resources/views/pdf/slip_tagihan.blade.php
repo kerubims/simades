@@ -193,7 +193,7 @@
     </table>
 
     <div class="footer">
-        <p>Dicetak pada: {{ date('d/m/Y H:i:s') }}</p>
+        <p>Dicetak pada: {{ now()->translatedFormat('d/m/Y H:i:s') }} WIB</p>
         <p>Terima kasih atas pembayaran tepat waktu Anda untuk mendukung operasional air desa.</p>
         <p><em>Simpan struk ini sebagai bukti pembayaran yang sah jika terjadi perbedaan pencatatan.</em></p>
     </div>
