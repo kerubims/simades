@@ -31,7 +31,7 @@
 
     <div class="relative w-full md:w-80">
         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
-        <input type="text" id="search-meteran" placeholder="Cari nama atau no. pelanggan..."
+        <input type="text" id="search-meteran" placeholder="Cari nama atau no. warga..."
             class="w-full pl-10 pr-4 py-2 rounded-xl border border-outline-variant/40 bg-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
     </div>
 </div>
@@ -60,7 +60,7 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-surface-container-low border-b border-outline-variant/30">
-                        <th class="p-4 font-semibold text-on-surface-variant">No. Pelanggan</th>
+                        <th class="p-4 font-semibold text-on-surface-variant">No. Warga</th>
                         <th class="p-4 font-semibold text-on-surface-variant">Nama</th>
                         <th class="p-4 font-semibold text-on-surface-variant">Meteran Akhir (Bulan Ini)</th>
                         <th class="p-4 font-semibold text-on-surface-variant">Status</th>
@@ -138,7 +138,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="p-6 text-center text-on-surface-variant">Tidak ada pelanggan aktif.</td>
+                            <td colspan="4" class="p-6 text-center text-on-surface-variant">Tidak ada warga aktif.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -169,7 +169,7 @@
 
         <div class="p-4 md:p-6 overflow-y-auto">
             <p class="text-sm text-on-surface-variant mb-4">
-                Pelanggan: <strong id="modal-nama" class="text-on-surface"></strong> &mdash; Periode: <strong id="modal-periode" class="text-on-surface"></strong>
+                Warga: <strong id="modal-nama" class="text-on-surface"></strong> &mdash; Periode: <strong id="modal-periode" class="text-on-surface"></strong>
             </p>
 
             <form id="form-edit-meteran" method="POST" class="flex flex-col gap-5">

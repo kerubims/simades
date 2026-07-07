@@ -1,11 +1,11 @@
 @extends('layouts.app')
-@section('title', 'Tambah Pelanggan')
+@section('title', 'Tambah Warga')
 
 @section('content')
 <div class="mb-6">
     <div class="flex items-center gap-2 mb-2">
         <a href="{{ route('admin.pelanggan.index') }}" class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">arrow_back</span></a>
-        <h1 class="text-2xl font-bold text-on-surface">Tambah Pelanggan Baru</h1>
+        <h1 class="text-2xl font-bold text-on-surface">Tambah Warga Baru</h1>
     </div>
     <p class="text-on-surface-variant ml-8">Data akan ditambahkan ke Google Sheets.</p>
 </div>

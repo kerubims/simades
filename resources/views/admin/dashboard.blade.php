@@ -10,7 +10,7 @@
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     <div class="bg-surface p-6 rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col justify-between">
         <div class="flex justify-between items-start mb-2">
-            <span class="text-on-surface-variant font-medium">Total Pelanggan Aktif</span>
+            <span class="text-on-surface-variant font-medium">Total Warga Aktif</span>
             <span class="material-symbols-outlined text-primary bg-primary-container/20 p-2 rounded-lg">group</span>
         </div>
         <h3 class="text-3xl font-bold text-on-surface">{{ $totalPelanggan }} <span class="text-sm font-normal text-on-surface-variant">KK</span></h3>
@@ -53,7 +53,7 @@
             <thead>
                 <tr class="bg-surface-container-low border-b border-outline-variant/30">
                     <th class="p-4 font-semibold text-on-surface-variant">ID Tagihan</th>
-                    <th class="p-4 font-semibold text-on-surface-variant">Pelanggan</th>
+                    <th class="p-4 font-semibold text-on-surface-variant">Warga</th>
                     <th class="p-4 font-semibold text-on-surface-variant">Pemakaian</th>
                     <th class="p-4 font-semibold text-on-surface-variant">Total</th>
                     <th class="p-4 font-semibold text-on-surface-variant">Status</th>

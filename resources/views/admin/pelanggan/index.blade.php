@@ -5,17 +5,17 @@
 <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
     <div>
         <h1 class="text-2xl font-bold text-on-surface">Manajemen User</h1>
-        <p class="text-on-surface-variant">Kelola akun warga (pelanggan) dan administrator sistem.</p>
+        <p class="text-on-surface-variant">Kelola akun warga dan administrator sistem.</p>
     </div>
     <a href="{{ route('admin.pelanggan.create') }}" class="bg-primary text-on-primary font-bold py-2 px-4 rounded-lg flex items-center gap-2 hover:opacity-90">
-        <span class="material-symbols-outlined">person_add</span> Tambah Pelanggan
+        <span class="material-symbols-outlined">person_add</span> Tambah Warga
     </a>
 </div>
 
 <!-- Tabs -->
 <div class="flex border-b border-outline-variant/30 mb-6">
     <a href="{{ route('admin.pelanggan.index') }}" class="px-6 py-3 font-semibold text-primary border-b-2 border-primary bg-surface-container-lowest transition-colors">
-        Data Pelanggan
+        Data Warga
     </a>
     <a href="{{ route('admin.admins.index') }}" class="px-6 py-3 font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-lowest border-b-2 border-transparent transition-colors">
         Data Admin
@@ -25,7 +25,7 @@
 <div class="mb-4">
     <div class="relative max-w-sm">
         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
-        <input type="text" id="search-pelanggan" placeholder="Cari nama, NIK, atau no. pelanggan..."
+        <input type="text" id="search-pelanggan" placeholder="Cari nama, NIK, atau no. warga..."
             class="w-full pl-10 pr-4 py-2 rounded-xl border border-outline-variant/40 bg-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
     </div>
 </div>
@@ -35,7 +35,7 @@
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-surface-container-low border-b border-outline-variant/30">
-                    <th class="p-4 font-semibold text-on-surface-variant">No. Pelanggan</th>
+                    <th class="p-4 font-semibold text-on-surface-variant">No. Warga</th>
                     <th class="p-4 font-semibold text-on-surface-variant">NIK / Nama Lengkap</th>
                     <th class="p-4 font-semibold text-on-surface-variant">RT/RW</th>
                     <th class="p-4 font-semibold text-on-surface-variant">No. WhatsApp</th>
@@ -67,7 +67,7 @@
                                 </a>
                                 @if($p->isAktif())
                                 <form action="{{ route('admin.pelanggan.destroy', $p->idPelanggan) }}" method="POST"
-                                      onsubmit="return confirm('⚠️ HAPUS AKUN\n\nAkun user {{ addslashes($p->namaLengkap) }} akan dihapus permanen.\nPelanggan tidak dapat login lagi dan harus registrasi ulang.\n\nData tagihan & riwayat tetap tersimpan.\n\nLanjutkan?');"
+                                      onsubmit="return confirm('⚠️ HAPUS AKUN\n\nAkun user {{ addslashes($p->namaLengkap) }} akan dihapus permanen.\nWarga tidak dapat login lagi dan harus registrasi ulang.\n\nData tagihan & riwayat tetap tersimpan.\n\nLanjutkan?');"
                                       class="inline">
                                     @csrf
                                     @method('DELETE')

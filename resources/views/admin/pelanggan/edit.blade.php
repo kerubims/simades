@@ -1,13 +1,13 @@
 @extends('layouts.app')
-@section('title', 'Edit Pelanggan')
+@section('title', 'Edit Warga')
 
 @section('content')
 <div class="mb-6">
     <div class="flex items-center gap-2 mb-2">
         <a href="{{ route('admin.pelanggan.index') }}" class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">arrow_back</span></a>
-        <h1 class="text-2xl font-bold text-on-surface">Edit Pelanggan</h1>
+        <h1 class="text-2xl font-bold text-on-surface">Edit Warga</h1>
     </div>
-    <p class="text-on-surface-variant ml-8">Ubah data pelanggan {{ $pelanggan->idPelanggan }} di Google Sheets.</p>
+    <p class="text-on-surface-variant ml-8">Ubah data warga {{ $pelanggan->idPelanggan }} di Google Sheets.</p>
 </div>
 
 <div class="bg-surface rounded-2xl shadow-sm border border-outline-variant/20 p-6 max-w-2xl">

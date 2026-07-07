@@ -124,11 +124,11 @@
                 <td>: {{ $tagihan->idTagihan }}</td>
             </tr>
             <tr>
-                <td>Nama Pelanggan</td>
+                <td>Nama Warga</td>
                 <td>: <strong>{{ $pelanggan->namaLengkap }}</strong></td>
             </tr>
             <tr>
-                <td>ID Pelanggan</td>
+                <td>ID Warga</td>
                 <td>: {{ $pelanggan->idPelanggan }}</td>
             </tr>
             <tr>

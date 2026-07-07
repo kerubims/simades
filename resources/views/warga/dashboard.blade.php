@@ -4,7 +4,7 @@
 @section('content')
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-on-surface">Halo, {{ $pelanggan->namaLengkap }}</h1>
-    <p class="text-on-surface-variant">Nomor Pelanggan: <strong>{{ $pelanggan->idPelanggan }}</strong> | RT/RW: {{ $pelanggan->rt }}/{{ $pelanggan->rw }}</p>
+    <p class="text-on-surface-variant">Nomor Warga: <strong>{{ $pelanggan->idPelanggan }}</strong> | RT/RW: {{ $pelanggan->rt }}/{{ $pelanggan->rw }}</p>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
