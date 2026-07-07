@@ -194,6 +194,44 @@ class TagihanService
     }
 
     /**
+     * Edit meteran (meter awal & akhir) dan hitung ulang tagihan.
+     * Hanya boleh dilakukan jika status bukan Lunas.
+     */
+    public function updateTagihanMeteran(TagihanData $tagihan, int $meterAwal, int $meterAkhir): bool
+    {
+        $tarif = $this->getTarif();
+        $pemakaian = max(0, $meterAkhir - $meterAwal);
+        $totalTagihan = $tarif->hitungTagihan($pemakaian);
+
+        $tagihan->meterAwal = $meterAwal;
+        $tagihan->meterAkhir = $meterAkhir;
+        $tagihan->totalPemakaianM3 = $pemakaian;
+        $tagihan->totalTagihan = $totalTagihan;
+
+        return $this->sheets->updateRow('transaksi_tagihan', $tagihan->rowIndex, $tagihan->toSheetRow());
+    }
+
+    /**
+     * Hitung ulang semua tagihan yang belum lunas menggunakan tarif baru.
+     */
+    public function recalculateUnpaidBills(TarifData $newTarif): void
+    {
+        $allBills = $this->getAll();
+
+        foreach ($allBills as $tagihan) {
+            if (! $tagihan->isSudahLunas()) {
+                $newTotal = $newTarif->hitungTagihan($tagihan->totalPemakaianM3);
+
+                if ($newTotal !== $tagihan->totalTagihan) {
+                    $tagihan->totalTagihan = $newTotal;
+                    // Hati-hati dengan API rate limit jika data sangat banyak. Idealnya batchUpdate.
+                    $this->sheets->updateRow('transaksi_tagihan', $tagihan->rowIndex, $tagihan->toSheetRow());
+                }
+            }
+        }
+    }
+
+    /**
      * Update status bayar menjadi Lunas.
      */
     public function tandaiLunas(TagihanData $tagihan): bool
@@ -284,9 +322,9 @@ class TagihanService
     }
 
     /**
-     * Update tarif air per m3.
+     * Update tarif air per m3 dan komponen lainnya.
      */
-    public function updateTarif(int $airPerM3, int $bebanSampah, int $danaKematian): bool
+    public function updateTarif(int $airPerM3, int $bebanSampah, int $danaKematian, int $biayaLampuJalan): bool
     {
         $tarif = $this->getTarif();
 
@@ -294,9 +332,19 @@ class TagihanService
         $ok2 = $this->sheets->updateCell('pengaturan_tarif', "B{$tarif->sampahRowIndex}", (string) $bebanSampah);
         $ok3 = $this->sheets->updateCell('pengaturan_tarif', "B{$tarif->kematianRowIndex}", (string) $danaKematian);
 
+        // Biaya lampu jalan: update jika sudah ada, append jika belum
+        if ($tarif->lampuJalanRowIndex > 0) {
+            $ok4 = $this->sheets->updateCell('pengaturan_tarif', "B{$tarif->lampuJalanRowIndex}", (string) $biayaLampuJalan);
+        } else {
+            $ok4 = $this->sheets->appendRow('pengaturan_tarif', [
+                'komponen' => 'biaya_lampu_jalan',
+                'nominal' => (string) $biayaLampuJalan,
+            ]);
+        }
+
         $this->sheets->clearCache('pengaturan_tarif');
 
-        return $ok1 && $ok2 && $ok3;
+        return $ok1 && $ok2 && $ok3 && $ok4;
     }
 
     /**

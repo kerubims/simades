@@ -45,6 +45,17 @@
             </div>
         </div>
 
+        <div class="flex items-center gap-4 bg-[#fffbeb] p-4 rounded-xl border border-[#fde68a]">
+            <span class="material-symbols-outlined text-[#b45309] text-4xl">light_mode</span>
+            <div class="flex-grow">
+                <label class="block text-sm font-bold text-[#78350f] mb-1">Biaya Lampu Jalan (Per Bulan)</label>
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-[#92400e]">Rp</span>
+                    <input type="number" name="biaya_lampu_jalan" value="{{ old('biaya_lampu_jalan', $tarif->biayaLampuJalan) }}" min="0" required class="w-full rounded-lg border-[#fcd34d] focus:border-[#f59e0b] focus:ring-[#f59e0b] font-bold" />
+                </div>
+            </div>
+        </div>
+
         <div class="mt-4 flex justify-end">
             <button type="submit" class="px-8 py-3 bg-primary text-on-primary rounded-lg font-bold hover:opacity-90 flex items-center gap-2">
                 <span class="material-symbols-outlined">save</span> Simpan Tarif Baru

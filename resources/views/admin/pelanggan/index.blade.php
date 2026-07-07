@@ -56,13 +56,19 @@
                                     <span class="material-symbols-outlined">edit</span>
                                 </a>
                                 @if($p->isAktif())
-                                <form action="{{ route('admin.pelanggan.destroy', $p->idPelanggan) }}" method="POST" onsubmit="return confirm('Yakin ingin menonaktifkan pelanggan ini?');" class="inline">
+                                <form action="{{ route('admin.pelanggan.destroy', $p->idPelanggan) }}" method="POST"
+                                      onsubmit="return confirm('⚠️ HAPUS AKUN\n\nAkun user {{ addslashes($p->namaLengkap) }} akan dihapus permanen.\nPelanggan tidak dapat login lagi dan harus registrasi ulang.\n\nData tagihan & riwayat tetap tersimpan.\n\nLanjutkan?');"
+                                      class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-error hover:text-on-error-container" title="Nonaktifkan">
-                                        <span class="material-symbols-outlined">person_off</span>
+                                    <button type="submit" class="text-error hover:text-on-error-container" title="Hapus Akun User">
+                                        <span class="material-symbols-outlined">delete_forever</span>
                                     </button>
                                 </form>
+                                @else
+                                <span class="text-on-surface-variant/40 cursor-not-allowed" title="Akun sudah dihapus">
+                                    <span class="material-symbols-outlined">no_accounts</span>
+                                </span>
                                 @endif
                             </div>
                         </td>

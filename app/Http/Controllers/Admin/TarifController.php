@@ -27,18 +27,24 @@ class TarifController extends Controller
             'air_per_m3' => ['required', 'integer', 'min:0'],
             'beban_sampah' => ['required', 'integer', 'min:0'],
             'dana_kematian' => ['required', 'integer', 'min:0'],
+            'biaya_lampu_jalan' => ['required', 'integer', 'min:0'],
         ]);
 
         $success = $this->tagihanService->updateTarif(
             airPerM3: (int) $validated['air_per_m3'],
             bebanSampah: (int) $validated['beban_sampah'],
             danaKematian: (int) $validated['dana_kematian'],
+            biayaLampuJalan: (int) $validated['biaya_lampu_jalan'],
         );
 
         if (! $success) {
             return back()->with('error', 'Gagal update tarif. Coba lagi.');
         }
 
-        return back()->with('success', 'Tarif berhasil diperbarui.');
+        // Ambil tarif terbaru dan hitung ulang semua tagihan yang belum lunas
+        $newTarif = $this->tagihanService->getTarif();
+        $this->tagihanService->recalculateUnpaidBills($newTarif);
+
+        return back()->with('success', 'Tarif berhasil diperbarui dan tagihan belum lunas telah disinkronkan.');
     }
 }

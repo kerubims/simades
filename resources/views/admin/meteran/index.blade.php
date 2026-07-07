@@ -36,6 +36,20 @@
     </div>
 </div>
 
+<!-- Legenda -->
+<div class="flex flex-wrap items-center gap-3 mb-4 text-xs">
+    <span class="font-semibold text-on-surface-variant">Keterangan:</span>
+    <span class="flex items-center gap-1.5 px-2 py-1 bg-[#dcfce7] text-[#166534] font-bold rounded-full">
+        <span class="material-symbols-outlined text-[14px]">check_circle</span> Sudah Dicatat (Lunas — tidak bisa diedit)
+    </span>
+    <span class="flex items-center gap-1.5 px-2 py-1 bg-[#fef9c3] text-[#854d0e] font-bold rounded-full">
+        <span class="material-symbols-outlined text-[14px]">edit</span> Sudah Dicatat (Belum Lunas — bisa diedit)
+    </span>
+    <span class="flex items-center gap-1.5 px-2 py-1 bg-[#f1f5f9] text-[#475569] font-bold rounded-full">
+        <span class="material-symbols-outlined text-[14px]">pending</span> Belum Dicatat
+    </span>
+</div>
+
 <div class="bg-surface rounded-2xl shadow-sm border border-outline-variant/20 overflow-hidden">
     <form action="{{ route('admin.meteran.massal') }}" method="POST">
         @csrf
@@ -63,6 +77,9 @@
                                 @if($tagihan)
                                     <span class="font-bold text-lg">{{ $tagihan->meterAkhir }}</span>
                                     <span class="text-sm text-on-surface-variant"> m&sup3;</span>
+                                    @if(!$tagihan->isSudahLunas())
+                                        <span class="ml-2 text-xs text-[#854d0e] bg-[#fef9c3] px-1.5 py-0.5 rounded">awal: {{ $tagihan->meterAwal }}</span>
+                                    @endif
                                 @elseif(isset($processingMap[$p->idPelanggan]))
                                     <span class="font-bold text-lg text-primary">{{ $processingMap[$p->idPelanggan]['meter_akhir'] }}</span>
                                     <span class="text-sm text-on-surface-variant"> m&sup3;</span>
@@ -87,11 +104,35 @@
                             </td>
                             <td class="p-4">
                                 @if($tagihan)
-                                    <span class="px-2 py-1 bg-[#dcfce7] text-[#166534] text-xs font-bold rounded-full">Sudah Dicatat</span>
+                                    @if($tagihan->isSudahLunas())
+                                        {{-- Lunas: tidak bisa diedit --}}
+                                        <div class="flex flex-col gap-1.5">
+                                            <span class="px-2 py-1 bg-[#dcfce7] text-[#166534] text-xs font-bold rounded-full flex items-center gap-1 w-fit">
+                                                <span class="material-symbols-outlined text-[14px]">check_circle</span> Sudah Dicatat
+                                            </span>
+                                            <span class="px-2 py-1 bg-[#dcfce7] text-[#166534] text-xs font-bold rounded-full flex items-center gap-1 w-fit">
+                                                <span class="material-symbols-outlined text-[14px]">lock</span> Lunas
+                                            </span>
+                                        </div>
+                                    @else
+                                        {{-- Belum lunas: bisa diedit --}}
+                                        <div class="flex flex-col gap-1.5">
+                                            <span class="px-2 py-1 bg-[#fef9c3] text-[#854d0e] text-xs font-bold rounded-full flex items-center gap-1 w-fit">
+                                                <span class="material-symbols-outlined text-[14px]">edit_note</span> Sudah Dicatat
+                                            </span>
+                                            <button type="button"
+                                                onclick="openEditModal('{{ $tagihan->idTagihan }}', '{{ $p->namaLengkap }}', '{{ $tagihan->periodeLabel() }}', {{ $tagihan->meterAwal }}, {{ $tagihan->meterAkhir }}, {{ $tagihan->totalTagihan }})"
+                                                class="px-2 py-1 bg-secondary text-white text-xs font-bold rounded-full flex items-center gap-1 w-fit hover:opacity-80 transition-opacity">
+                                                <span class="material-symbols-outlined text-[14px]">edit</span> Edit Meteran
+                                            </button>
+                                        </div>
+                                    @endif
                                 @elseif(isset($processingMap[$p->idPelanggan]))
                                     <span class="px-2 py-1 bg-[#e0f2fe] text-[#0369a1] text-xs font-bold rounded-full flex items-center gap-1 w-fit"><span class="material-symbols-outlined text-[14px] animate-spin">sync</span> Memproses...</span>
                                 @else
-                                    <span class="px-2 py-1 bg-[#f1f5f9] text-[#475569] text-xs font-bold rounded-full">Belum Dicatat</span>
+                                    <span class="px-2 py-1 bg-[#f1f5f9] text-[#475569] text-xs font-bold rounded-full flex items-center gap-1 w-fit">
+                                        <span class="material-symbols-outlined text-[14px]">pending</span> Belum Dicatat
+                                    </span>
                                 @endif
                             </td>
                         </tr>
@@ -113,6 +154,88 @@
         @endif
     </form>
 </div>
+
+<!-- Modal Edit Meteran -->
+<div id="editModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="bg-surface w-full max-w-xl rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="p-4 md:p-6 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
+            <h2 class="text-lg md:text-xl font-bold text-on-surface flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary">edit_note</span> Edit Meteran
+            </h2>
+            <button onclick="closeEditModal()" class="text-on-surface-variant hover:text-error transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="p-4 md:p-6 overflow-y-auto">
+            <p class="text-sm text-on-surface-variant mb-4">
+                Pelanggan: <strong id="modal-nama" class="text-on-surface"></strong> &mdash; Periode: <strong id="modal-periode" class="text-on-surface"></strong>
+            </p>
+
+            <form id="form-edit-meteran" method="POST" class="flex flex-col gap-5">
+                @csrf
+                @method('PUT')
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-on-surface-variant mb-1">Meter Awal</label>
+                        <input type="number" name="meter_awal" id="modal_meter_awal" min="0" required 
+                               class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-bold text-lg" 
+                               oninput="hitungPreview()" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-on-surface-variant mb-1">Meter Akhir</label>
+                        <input type="number" name="meter_akhir" id="modal_meter_akhir" min="0" required 
+                               class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-bold text-lg" 
+                               oninput="hitungPreview()" />
+                    </div>
+                </div>
+
+                {{-- Preview Kalkulasi Modal --}}
+                <div class="p-4 bg-[#eff6ff] rounded-xl border border-[#bfdbfe] text-sm mt-2">
+                    <p class="font-semibold text-[#1e3a8a] mb-3">Preview Tagihan Baru:</p>
+                    <div class="flex justify-between mb-1"><span class="text-[#1e40af]">Pemakaian</span><span class="font-bold text-[#1e40af]" id="modal-prev-pemakaian">0 m&sup3;</span></div>
+                    
+                    @php $tarif = app(App\Services\TagihanService::class)->getTarif(); @endphp
+                    
+                    <div class="mt-2 pt-2 border-t border-[#bfdbfe] space-y-1 text-xs text-[#1e40af]">
+                        <div class="flex justify-between">
+                            <span>Air (<span id="modal-rincian-pemakaian">0</span> m³ × Rp {{ number_format($tarif->airPerM3, 0, ',', '.') }})</span>
+                            <span id="modal-rincian-air">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Beban Sampah</span>
+                            <span>Rp {{ number_format($tarif->bebanSampah, 0, ',', '.') }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Dana Kematian</span>
+                            <span>Rp {{ number_format($tarif->danaKematian, 0, ',', '.') }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Biaya Lampu Jalan</span>
+                            <span>Rp {{ number_format($tarif->biayaLampuJalan, 0, ',', '.') }}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between border-t border-[#bfdbfe] mt-3 pt-3">
+                        <span class="text-[#1e40af] font-bold">Total Tagihan Baru</span>
+                        <span class="font-bold text-[#1d4ed8] text-base md:text-lg" id="modal-prev-total">Rp 0</span>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex justify-end gap-3">
+                    <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 rounded-lg border border-outline-variant text-on-surface-variant font-bold hover:bg-surface-container-low transition-colors text-sm md:text-base">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-6 py-2.5 bg-primary text-on-primary rounded-lg font-bold hover:opacity-90 flex items-center gap-2 transition-opacity text-sm md:text-base">
+                        <span class="material-symbols-outlined">save</span> Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
@@ -130,8 +253,69 @@
 </script>
 @endif
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    new TablePagination('tbl-meteran', 'search-meteran');
-});
+    const tarif = {
+        airPerM3: {{ $tarif->airPerM3 ?? 0 }},
+        bebanSampah: {{ $tarif->bebanSampah ?? 0 }},
+        danaKematian: {{ $tarif->danaKematian ?? 0 }},
+        biayaLampuJalan: {{ $tarif->biayaLampuJalan ?? 0 }}
+    };
+
+    function formatRupiah(num) {
+        return 'Rp ' + num.toLocaleString('id-ID');
+    }
+
+    function openEditModal(idTagihan, nama, periode, awal, akhir, totalOld) {
+        const modal = document.getElementById('editModal');
+        const form = document.getElementById('form-edit-meteran');
+        
+        // Populate data
+        document.getElementById('modal-nama').textContent = nama;
+        document.getElementById('modal-periode').textContent = periode;
+        document.getElementById('modal_meter_awal').value = awal;
+        document.getElementById('modal_meter_akhir').value = akhir;
+        
+        // Update form action route
+        form.action = `/admin/meteran/${idTagihan}`;
+        
+        // Trigger calc
+        hitungPreview();
+        
+        // Show modal
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        
+        // Prevent body scroll on mobile
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeEditModal() {
+        const modal = document.getElementById('editModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = 'auto';
+    }
+
+    function hitungPreview() {
+        const awal = parseInt(document.getElementById('modal_meter_awal').value) || 0;
+        const akhir = parseInt(document.getElementById('modal_meter_akhir').value) || 0;
+        const pemakaian = Math.max(0, akhir - awal);
+        const total = (pemakaian * tarif.airPerM3) + tarif.bebanSampah + tarif.danaKematian + tarif.biayaLampuJalan;
+
+        document.getElementById('modal-prev-pemakaian').textContent = pemakaian + ' m³';
+        document.getElementById('modal-rincian-pemakaian').textContent = pemakaian;
+        document.getElementById('modal-rincian-air').textContent = formatRupiah(pemakaian * tarif.airPerM3);
+        document.getElementById('modal-prev-total').textContent = formatRupiah(total);
+    }
+
+    // Close on outside click
+    document.getElementById('editModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEditModal();
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        new TablePagination('tbl-meteran', 'search-meteran');
+    });
 </script>
 @endsection

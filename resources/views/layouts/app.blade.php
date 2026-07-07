@@ -46,7 +46,7 @@
                     ['route' => 'admin.pelanggan.index', 'match' => 'admin.pelanggan.*',   'icon' => 'group',        'label' => 'Pelanggan'],
                     ['route' => 'admin.meteran.index',   'match' => 'admin.meteran.*',     'icon' => 'speed',        'label' => 'Catat Meteran'],
                     ['route' => 'admin.tagihan.index',   'match' => 'admin.tagihan.*',     'icon' => 'receipt_long', 'label' => 'Tagihan'],
-                    ['route' => 'admin.tarif.index',     'match' => 'admin.tarif.*',       'icon' => 'price_change', 'label' => 'Tarif Air'],
+                    ['route' => 'admin.tarif.index',     'match' => 'admin.tarif.*',       'icon' => 'price_change', 'label' => 'Tarif'],
                     ['route' => 'admin.qris.index',      'match' => 'admin.qris.*',        'icon' => 'qr_code_2',   'label' => 'QRIS Pembayaran'],
                 ];
             @endphp

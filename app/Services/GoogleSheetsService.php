@@ -4,6 +4,8 @@ namespace App\Services;
 
 use Google\Client;
 use Google\Service\Sheets;
+use Google\Service\Sheets\BatchUpdateSpreadsheetRequest;
+use Google\Service\Sheets\Request;
 use Google\Service\Sheets\ValueRange;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -31,7 +33,7 @@ class GoogleSheetsService
 
     private function buildSheetsService(): Sheets
     {
-        $client = new Client();
+        $client = new Client;
         $httpClient = new \GuzzleHttp\Client(['verify' => false]);
         $client->setHttpClient($httpClient);
         $client->setApplicationName('SIMADES');
@@ -95,7 +97,7 @@ class GoogleSheetsService
     /**
      * Tambah baris baru di bawah (append).
      *
-     * @param array<string, string> $data
+     * @param  array<string, string>  $data
      */
     public function appendRow(string $sheetName, array $data): bool
     {
@@ -107,7 +109,7 @@ class GoogleSheetsService
                 $rowValues[] = $data[$header] ?? '';
             }
 
-            $valueRange = new ValueRange();
+            $valueRange = new ValueRange;
             $valueRange->setValues([$rowValues]);
 
             $this->service->spreadsheets_values->append(
@@ -130,7 +132,7 @@ class GoogleSheetsService
     /**
      * Update satu baris berdasarkan nomor baris (1-indexed, row 1 = header).
      *
-     * @param array<string, string> $data
+     * @param  array<string, string>  $data
      */
     public function updateRow(string $sheetName, int $rowNumber, array $data): bool
     {
@@ -143,7 +145,7 @@ class GoogleSheetsService
             }
 
             $range = "{$sheetName}!A{$rowNumber}";
-            $valueRange = new ValueRange();
+            $valueRange = new ValueRange;
             $valueRange->setValues([$rowValues]);
 
             $this->service->spreadsheets_values->update(
@@ -169,7 +171,7 @@ class GoogleSheetsService
     public function updateCell(string $sheetName, string $cellRange, string $value): bool
     {
         try {
-            $valueRange = new ValueRange();
+            $valueRange = new ValueRange;
             $valueRange->setValues([[$value]]);
 
             $this->service->spreadsheets_values->update(
@@ -208,6 +210,55 @@ class GoogleSheetsService
         }
 
         return null;
+    }
+
+    /**
+     * Hapus baris dari sheet berdasarkan nomor baris (1-indexed, row 1 = header).
+     */
+    public function deleteRow(string $sheetName, int $rowNumber): bool
+    {
+        try {
+            // Ambil sheetId dari spreadsheet
+            $spreadsheet = $this->service->spreadsheets->get($this->spreadsheetId);
+            $sheetId = null;
+
+            foreach ($spreadsheet->getSheets() as $sheet) {
+                if ($sheet->getProperties()->getTitle() === $sheetName) {
+                    $sheetId = $sheet->getProperties()->getSheetId();
+                    break;
+                }
+            }
+
+            if ($sheetId === null) {
+                Log::error("GoogleSheets deleteRow: sheet [{$sheetName}] tidak ditemukan.");
+
+                return false;
+            }
+
+            $request = new Request([
+                'deleteDimension' => [
+                    'range' => [
+                        'sheetId' => $sheetId,
+                        'dimension' => 'ROWS',
+                        'startIndex' => $rowNumber - 1, // 0-indexed
+                        'endIndex' => $rowNumber,       // exclusive
+                    ],
+                ],
+            ]);
+
+            $batchUpdateRequest = new BatchUpdateSpreadsheetRequest([
+                'requests' => [$request],
+            ]);
+
+            $this->service->spreadsheets->batchUpdate($this->spreadsheetId, $batchUpdateRequest);
+            $this->clearCache($sheetName);
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::error("GoogleSheets deleteRow [{$sheetName}] row {$rowNumber} error: ".$e->getMessage());
+
+            return false;
+        }
     }
 
     /**

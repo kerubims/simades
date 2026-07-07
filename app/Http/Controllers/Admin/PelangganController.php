@@ -31,7 +31,7 @@ class PelangganController extends Controller
         if ($request->has('no_whatsapp')) {
             $wa = preg_replace('/[^0-9]/', '', $request->input('no_whatsapp'));
             if (str_starts_with($wa, '08')) {
-                $wa = '628' . substr($wa, 2);
+                $wa = '628'.substr($wa, 2);
             }
             $request->merge(['no_whatsapp' => $wa]);
         }
@@ -85,7 +85,7 @@ class PelangganController extends Controller
         if ($request->has('no_whatsapp')) {
             $wa = preg_replace('/[^0-9]/', '', $request->input('no_whatsapp'));
             if (str_starts_with($wa, '08')) {
-                $wa = '628' . substr($wa, 2);
+                $wa = '628'.substr($wa, 2);
             }
             $request->merge(['no_whatsapp' => $wa]);
         }
@@ -113,7 +113,7 @@ class PelangganController extends Controller
             return back()->withInput()->with('error', 'Gagal update pelanggan.');
         }
 
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $this->pelangganService->updateUserPassword($pelanggan->idUser, $validated['password']);
         }
 
@@ -129,9 +129,14 @@ class PelangganController extends Controller
             abort(404, 'Pelanggan tidak ditemukan.');
         }
 
-        $this->pelangganService->deactivate($pelanggan);
+        $success = $this->pelangganService->deleteUser($pelanggan);
+
+        if (! $success) {
+            return redirect()->route('admin.pelanggan.index')
+                ->with('error', 'Gagal menghapus akun user. Pastikan data user tersedia.');
+        }
 
         return redirect()->route('admin.pelanggan.index')
-            ->with('success', 'Pelanggan berhasil dinonaktifkan.');
+            ->with('success', 'Akun user berhasil dihapus. Pelanggan tidak dapat login dan tidak akan muncul di catat meteran.');
     }
 }

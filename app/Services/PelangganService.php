@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Data\PelangganData;
 use App\Data\UserData;
-use Illuminate\Support\Str;
 
 class PelangganService
 {
@@ -64,7 +63,7 @@ class PelangganService
     /**
      * Buat pelanggan baru beserta akun user-nya.
      *
-     * @param array<string, string> $data
+     * @param  array<string, string>  $data
      */
     public function create(array $data): bool
     {
@@ -100,7 +99,7 @@ class PelangganService
     /**
      * Update data pelanggan.
      *
-     * @param array<string, string> $data
+     * @param  array<string, string>  $data
      */
     public function update(PelangganData $pelanggan, array $data): bool
     {
@@ -152,6 +151,24 @@ class PelangganService
             'no_whatsapp' => $pelanggan->noWhatsapp,
             'status_aktif' => 'Non-Aktif',
         ]);
+    }
+
+    /**
+     * Hapus akun user secara permanen dari sheet users dan data pelanggan dari sheet pelanggan.
+     */
+    public function deleteUser(PelangganData $pelanggan): bool
+    {
+        $user = $this->findUserByIdUser($pelanggan->idUser);
+
+        if ($user !== null) {
+            // Hapus baris user dari sheet users
+            $this->sheets->deleteRow('users', $user->rowIndex);
+        }
+
+        // Hapus baris data pelanggan
+        $deleted = $this->sheets->deleteRow('pelanggan', $pelanggan->rowIndex);
+
+        return $deleted;
     }
 
     /**

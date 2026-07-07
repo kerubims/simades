@@ -41,6 +41,7 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin'])->group(functi
     Route::get('/meteran', [MeteranController::class, 'index'])->name('meteran.index');
     Route::post('/meteran', [MeteranController::class, 'store'])->name('meteran.store');
     Route::post('/meteran/massal', [MeteranController::class, 'storeMassal'])->name('meteran.massal');
+    Route::put('/meteran/{idTagihan}', [MeteranController::class, 'update'])->name('meteran.update');
 
     // Tagihan & Pembayaran
     Route::get('/tagihan', [TagihanController::class, 'index'])->name('tagihan.index');

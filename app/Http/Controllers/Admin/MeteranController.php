@@ -155,4 +155,63 @@ class MeteranController extends Controller
         return redirect()->route('admin.meteran.index', ['bulan' => $validated['bulan'], 'tahun' => $validated['tahun']])
             ->with('success', "{$dispatched} data meteran berhasil disimpan dan diproses di background.");
     }
+
+    /**
+     * Form edit meteran yang sudah dicatat (hanya jika belum lunas).
+     */
+    public function edit(string $idTagihan): View|RedirectResponse
+    {
+        $tagihan = $this->tagihanService->findById($idTagihan);
+
+        if ($tagihan === null) {
+            abort(404, 'Tagihan tidak ditemukan.');
+        }
+
+        if ($tagihan->isSudahLunas()) {
+            return redirect()->route('admin.meteran.index')
+                ->with('error', 'Meteran tidak dapat diedit karena tagihan sudah lunas.');
+        }
+
+        $pelanggan = $this->pelangganService->findById($tagihan->idPelanggan);
+        $tarif = $this->tagihanService->getTarif();
+
+        return view('admin.meteran.edit', compact('tagihan', 'pelanggan', 'tarif'));
+    }
+
+    /**
+     * Simpan perubahan meteran dan hitung ulang tagihan.
+     */
+    public function update(Request $request, string $idTagihan): RedirectResponse
+    {
+        $tagihan = $this->tagihanService->findById($idTagihan);
+
+        if ($tagihan === null) {
+            abort(404, 'Tagihan tidak ditemukan.');
+        }
+
+        if ($tagihan->isSudahLunas()) {
+            return redirect()->route('admin.meteran.index')
+                ->with('error', 'Meteran tidak dapat diedit karena tagihan sudah lunas.');
+        }
+
+        $validated = $request->validate([
+            'meter_awal' => ['required', 'integer', 'min:0'],
+            'meter_akhir' => ['required', 'integer', 'min:0', 'gte:meter_awal'],
+        ]);
+
+        $success = $this->tagihanService->updateTagihanMeteran(
+            tagihan: $tagihan,
+            meterAwal: (int) $validated['meter_awal'],
+            meterAkhir: (int) $validated['meter_akhir'],
+        );
+
+        if (! $success) {
+            return back()->with('error', 'Gagal menyimpan perubahan meteran. Coba lagi.');
+        }
+
+        return redirect()->route('admin.meteran.index', [
+            'bulan' => $tagihan->periodeBulan,
+            'tahun' => $tagihan->periodeTahun,
+        ])->with('success', 'Data meteran berhasil diperbarui dan tagihan sudah dihitung ulang.');
+    }
 }
