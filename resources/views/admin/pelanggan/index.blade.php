@@ -1,14 +1,24 @@
 @extends('layouts.app')
-@section('title', 'Data Pelanggan')
+@section('title', 'Manajemen User')
 
 @section('content')
 <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
     <div>
-        <h1 class="text-2xl font-bold text-on-surface">Data Pelanggan</h1>
-        <p class="text-on-surface-variant">Kelola warga penerima layanan air bersih desa.</p>
+        <h1 class="text-2xl font-bold text-on-surface">Manajemen User</h1>
+        <p class="text-on-surface-variant">Kelola akun warga (pelanggan) dan administrator sistem.</p>
     </div>
     <a href="{{ route('admin.pelanggan.create') }}" class="bg-primary text-on-primary font-bold py-2 px-4 rounded-lg flex items-center gap-2 hover:opacity-90">
         <span class="material-symbols-outlined">person_add</span> Tambah Pelanggan
+    </a>
+</div>
+
+<!-- Tabs -->
+<div class="flex border-b border-outline-variant/30 mb-6">
+    <a href="{{ route('admin.pelanggan.index') }}" class="px-6 py-3 font-semibold text-primary border-b-2 border-primary bg-surface-container-lowest transition-colors">
+        Data Pelanggan
+    </a>
+    <a href="{{ route('admin.admins.index') }}" class="px-6 py-3 font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-lowest border-b-2 border-transparent transition-colors">
+        Data Admin
     </a>
 </div>
 

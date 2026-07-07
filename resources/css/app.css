@@ -125,3 +125,44 @@
     --text-label-lg--letter-spacing: 0.02em;
     --text-label-lg--font-weight: 600;
 }
+
+@layer base {
+    input[type="text"],
+    input[type="number"],
+    input[type="password"],
+    input[type="email"],
+    input[type="date"],
+    input[type="search"],
+    select,
+    textarea {
+        @apply bg-surface-container-lowest border border-outline-variant/60 rounded-lg px-4 py-2 text-on-surface transition-all duration-200 shadow-sm;
+    }
+
+    input[type="text"]:hover:not(:disabled),
+    input[type="number"]:hover:not(:disabled),
+    input[type="password"]:hover:not(:disabled),
+    input[type="email"]:hover:not(:disabled),
+    input[type="date"]:hover:not(:disabled),
+    input[type="search"]:hover:not(:disabled),
+    select:hover:not(:disabled),
+    textarea:hover:not(:disabled) {
+        @apply border-outline bg-surface-bright;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="password"]:focus,
+    input[type="email"]:focus,
+    input[type="date"]:focus,
+    input[type="search"]:focus,
+    select:focus,
+    textarea:focus {
+        @apply outline-none ring-2 ring-primary/30 border-primary bg-surface-container-lowest;
+    }
+
+    input:disabled,
+    select:disabled,
+    textarea:disabled {
+        @apply bg-surface-container-high text-on-surface-variant cursor-not-allowed opacity-70 border-outline-variant/30;
+    }
+}

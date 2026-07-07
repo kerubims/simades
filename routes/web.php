@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\MeteranController;
 use App\Http\Controllers\Admin\PelangganController;
@@ -36,6 +37,9 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin'])->group(functi
 
     // Pelanggan CRUD
     Route::resource('pelanggan', PelangganController::class)->except(['show']);
+
+    // Admin Users CRUD
+    Route::resource('admins', AdminUserController::class)->except(['show']);
 
     // Catat Meteran
     Route::get('/meteran', [MeteranController::class, 'index'])->name('meteran.index');

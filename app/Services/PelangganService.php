@@ -251,4 +251,51 @@ class PelangganService
 
         return null;
     }
+
+    /**
+     * Ambil semua user admin.
+     *
+     * @return array<int, UserData>
+     */
+    public function getAllAdmins(): array
+    {
+        $rows = $this->sheets->getSheet('users');
+        $result = [];
+
+        foreach ($rows as $index => $row) {
+            $user = UserData::fromSheetRow($row, $index + 2);
+            if ($user->role === 'admin') {
+                $result[] = $user;
+            }
+        }
+
+        return $result;
+    }
+
+    public function createAdmin(array $data): bool
+    {
+        $idUser = $this->generateIdUser();
+
+        return $this->sheets->appendRow('users', [
+            'id_user' => $idUser,
+            'username' => $data['username'],
+            'password' => bcrypt($data['password']),
+            'role' => 'admin',
+        ]);
+    }
+
+    public function updateAdmin(UserData $admin, array $data): bool
+    {
+        return $this->sheets->updateRow('users', $admin->rowIndex, [
+            'id_user' => $admin->idUser,
+            'username' => $data['username'] ?? $admin->username,
+            'password' => ! empty($data['password']) ? bcrypt($data['password']) : $admin->password,
+            'role' => 'admin',
+        ]);
+    }
+
+    public function deleteAdmin(UserData $admin): bool
+    {
+        return $this->sheets->deleteRow('users', $admin->rowIndex);
+    }
 }
