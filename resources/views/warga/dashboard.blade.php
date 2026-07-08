@@ -46,9 +46,13 @@
                     <span class="text-on-surface-variant">Beban Sampah</span>
                     <span class="font-semibold text-on-surface">Rp {{ number_format($tarif->bebanSampah, 0, ',', '.') }}</span>
                 </div>
-                <div class="flex justify-between items-center mb-3 text-sm">
+                <div class="flex justify-between items-center mb-1 text-sm">
                     <span class="text-on-surface-variant">Dana Sosial / Kematian</span>
                     <span class="font-semibold text-on-surface">Rp {{ number_format($tarif->danaKematian, 0, ',', '.') }}</span>
+                </div>
+                <div class="flex justify-between items-center mb-3 text-sm">
+                    <span class="text-on-surface-variant">Biaya Lampu Jalan</span>
+                    <span class="font-semibold text-on-surface">Rp {{ number_format($tarif->biayaLampuJalan, 0, ',', '.') }}</span>
                 </div>
 
                 <div class="flex justify-between items-center pt-3 border-t-2 border-primary/30">
@@ -121,6 +125,10 @@
             <div class="flex justify-between items-center p-3 bg-surface-container-low rounded-lg">
                 <span class="text-on-surface-variant">Dana Kematian /Bulan</span>
                 <span class="font-bold">Rp {{ number_format($tarif->danaKematian, 0, ',', '.') }}</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-surface-container-low rounded-lg">
+                <span class="text-on-surface-variant">Lampu Jalan /Bulan</span>
+                <span class="font-bold">Rp {{ number_format($tarif->biayaLampuJalan, 0, ',', '.') }}</span>
             </div>
         </div>
     </div>
