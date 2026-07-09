@@ -28,10 +28,46 @@ class TagihanController extends Controller
             $pelangganMap[$p->idPelanggan] = $p;
         }
 
+        $sortBy = $request->query('sort', 'status');
+
+        // Sorting Logic
+        usort($tagihanList, function ($a, $b) use ($pelangganMap, $sortBy) {
+            $namaA = strtolower($pelangganMap[$a->idPelanggan]->namaLengkap ?? '');
+            $namaB = strtolower($pelangganMap[$b->idPelanggan]->namaLengkap ?? '');
+
+            if ($sortBy === 'nama_asc') {
+                return strcmp($namaA, $namaB);
+            } elseif ($sortBy === 'nama_desc') {
+                return strcmp($namaB, $namaA);
+            } elseif ($sortBy === 'tertinggi') {
+                return $b->totalTagihan <=> $a->totalTagihan;
+            } elseif ($sortBy === 'terendah') {
+                return $a->totalTagihan <=> $b->totalTagihan;
+            } elseif ($sortBy === 'terbaru') {
+                return strcmp($b->idPelanggan, $a->idPelanggan);
+            } else {
+                // Default: Status Bayar -> Nama Lengkap
+                $statusOrder = [
+                    'Menunggu Konfirmasi' => 0,
+                    'Belum Bayar' => 1,
+                    'Lunas' => 2,
+                ];
+
+                $orderA = $statusOrder[$a->statusBayar] ?? 99;
+                $orderB = $statusOrder[$b->statusBayar] ?? 99;
+
+                if ($orderA !== $orderB) {
+                    return $orderA <=> $orderB;
+                }
+
+                return strcmp($namaA, $namaB);
+            }
+        });
+
         $qrisPath = $this->tagihanService->getQrisPath();
         $qrisUrl = $qrisPath ? Storage::disk('public')->url($qrisPath) : null;
 
-        return view('admin.tagihan.index', compact('tagihanList', 'pelangganMap', 'bulan', 'tahun', 'qrisUrl'));
+        return view('admin.tagihan.index', compact('tagihanList', 'pelangganMap', 'bulan', 'tahun', 'qrisUrl', 'sortBy'));
     }
 
     public function tandaiLunas(string $idTagihan): RedirectResponse

@@ -181,8 +181,33 @@ class PelangganService
 
     private function generateIdPelanggan(): string
     {
-        $rows = $this->sheets->getSheet('pelanggan');
-        $nextNumber = count($rows) + 1;
+        $maxNumber = 0;
+
+        // 1. Cek dari sheet pelanggan
+        $rowsPelanggan = $this->sheets->getSheet('pelanggan');
+        foreach ($rowsPelanggan as $row) {
+            $id = $row['id_pelanggan'] ?? '';
+            if (preg_match('/^PLG(\d+)$/', $id, $matches)) {
+                $num = (int) $matches[1];
+                if ($num > $maxNumber) {
+                    $maxNumber = $num;
+                }
+            }
+        }
+
+        // 2. Cek juga dari sheet transaksi_tagihan (menghindari ID didaur ulang jika tagihannya masih ada)
+        $rowsTagihan = $this->sheets->getSheet('transaksi_tagihan');
+        foreach ($rowsTagihan as $row) {
+            $id = $row['id_pelanggan'] ?? '';
+            if (preg_match('/^PLG(\d+)$/', $id, $matches)) {
+                $num = (int) $matches[1];
+                if ($num > $maxNumber) {
+                    $maxNumber = $num;
+                }
+            }
+        }
+
+        $nextNumber = $maxNumber + 1;
 
         return 'PLG'.str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
     }
@@ -190,7 +215,19 @@ class PelangganService
     private function generateIdUser(): string
     {
         $rows = $this->sheets->getSheet('users');
-        $nextNumber = count($rows) + 1;
+        $maxNumber = 0;
+
+        foreach ($rows as $row) {
+            $id = $row['id_user'] ?? '';
+            if (preg_match('/^U(\d+)$/', $id, $matches)) {
+                $num = (int) $matches[1];
+                if ($num > $maxNumber) {
+                    $maxNumber = $num;
+                }
+            }
+        }
+
+        $nextNumber = $maxNumber + 1;
 
         return 'U'.str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
     }

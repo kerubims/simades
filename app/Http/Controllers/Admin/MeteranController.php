@@ -24,6 +24,34 @@ class MeteranController extends Controller
         $tahun = (int) ($request->query('tahun', date('Y')));
 
         $pelangganList = $this->pelangganService->getAll(aktifOnly: true);
+        $sortBy = $request->query('sort', 'rt_rw');
+
+        // Sorting Logic
+        usort($pelangganList, function ($a, $b) use ($sortBy) {
+            if ($sortBy === 'nama_asc') {
+                return strcmp(strtolower($a->namaLengkap), strtolower($b->namaLengkap));
+            } elseif ($sortBy === 'nama_desc') {
+                return strcmp(strtolower($b->namaLengkap), strtolower($a->namaLengkap));
+            } elseif ($sortBy === 'terbaru') {
+                // Asumsi ID Warga (contoh: PLG015) dibuat incremental.
+                // ID yang lebih besar = Warga terbaru.
+                return strcmp($b->idPelanggan, $a->idPelanggan);
+            } else {
+                // Default: RT -> RW -> Nama Lengkap
+                $rtCmp = strcmp((string) $a->rt, (string) $b->rt);
+                if ($rtCmp !== 0) {
+                    return $rtCmp;
+                }
+
+                $rwCmp = strcmp((string) $a->rw, (string) $b->rw);
+                if ($rwCmp !== 0) {
+                    return $rwCmp;
+                }
+
+                return strcmp(strtolower($a->namaLengkap), strtolower($b->namaLengkap));
+            }
+        });
+
         $tagihanBulanIni = $this->tagihanService->getByPeriode($bulan, $tahun);
 
         // Buat map id_pelanggan => tagihan untuk pengecekan di view
@@ -41,7 +69,7 @@ class MeteranController extends Controller
 
         $processingMap = Cache::get("processing_meter_{$bulan}_{$tahun}", []);
 
-        return view('admin.meteran.index', compact('pelangganList', 'tagihanMap', 'meterAwalMap', 'processingMap', 'bulan', 'tahun'));
+        return view('admin.meteran.index', compact('pelangganList', 'tagihanMap', 'meterAwalMap', 'processingMap', 'bulan', 'tahun', 'sortBy'));
     }
 
     public function store(Request $request): RedirectResponse

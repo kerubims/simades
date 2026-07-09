@@ -191,17 +191,23 @@
                                 <p class="text-on-surface-variant font-medium">Mei 2026</p>
                             </div>
                             <div class="space-y-3 font-body-md text-on-surface">
+                                @php
+                                    $pemakaian = 65;
+                                    $totalAir = $pemakaian * $tarif->airPerM3;
+                                    $totalBayar = $totalAir + $tarif->danaKematian + $tarif->bebanSampah + $tarif->biayaLampuJalan;
+                                @endphp
                                 <div class="flex justify-between font-semibold text-lg text-primary"><span>Nama:</span> <span>Pak Kasun</span></div>
                                 <div class="flex justify-between text-on-surface-variant"><span>Meter Awal:</span> <span>04383 m³</span></div>
                                 <div class="flex justify-between text-on-surface-variant"><span>Meter Akhir:</span> <span>04448 m³</span></div>
                                 <div class="flex justify-between text-on-surface-variant"><span>Pemakaian:</span> <span>065 m³</span></div>
-                                <div class="flex justify-between border-b border-outline-variant/20 pb-3 text-on-surface-variant"><span>Harga m³:</span> <span>Rp 500</span></div>
+                                <div class="flex justify-between border-b border-outline-variant/20 pb-3 text-on-surface-variant"><span>Harga m³:</span> <span>Rp {{ number_format($tarif->airPerM3, 0, ',', '.') }}</span></div>
                                 
-                                <div class="flex justify-between pt-2"><span>Total Air:</span> <span>Rp 32.500</span></div>
-                                <div class="flex justify-between"><span>Dana Sosial:</span> <span>Rp 2.000</span></div>
-                                <div class="flex justify-between border-b border-outline-variant/20 pb-3"><span>Dana Sampah:</span> <span>Rp 10.000</span></div>
+                                <div class="flex justify-between pt-2"><span>Total Air:</span> <span>Rp {{ number_format($totalAir, 0, ',', '.') }}</span></div>
+                                <div class="flex justify-between"><span>Dana Sosial:</span> <span>Rp {{ number_format($tarif->danaKematian, 0, ',', '.') }}</span></div>
+                                <div class="flex justify-between"><span>Dana Sampah:</span> <span>Rp {{ number_format($tarif->bebanSampah, 0, ',', '.') }}</span></div>
+                                <div class="flex justify-between border-b border-outline-variant/20 pb-3"><span>Lampu Jalan:</span> <span>Rp {{ number_format($tarif->biayaLampuJalan, 0, ',', '.') }}</span></div>
                                 
-                                <div class="flex justify-between pt-3 font-bold text-xl text-on-surface"><span>Total Bayar:</span> <span>Rp 44.500</span></div>
+                                <div class="flex justify-between pt-3 font-bold text-xl text-on-surface"><span>Total Bayar:</span> <span>Rp {{ number_format($totalBayar, 0, ',', '.') }}</span></div>
                                 
                                 <div class="mt-6 bg-tertiary-container/20 text-tertiary p-3 rounded-lg text-center font-bold flex justify-center items-center gap-2">
                                     <span class="material-symbols-outlined">verified</span> Status: Sudah Lunas

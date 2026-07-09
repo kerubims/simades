@@ -26,6 +26,17 @@
                 @endforeach
             </select>
         </div>
+        <div class="flex items-center gap-2">
+            <label class="font-semibold text-sm">Urutkan:</label>
+            <select name="sort" class="rounded-lg border-outline-variant py-1 text-sm">
+                <option value="status" {{ (isset($sortBy) ? $sortBy : request('sort')) === 'status' ? 'selected' : '' }}>Prioritas Status</option>
+                <option value="nama_asc" {{ (isset($sortBy) ? $sortBy : request('sort')) === 'nama_asc' ? 'selected' : '' }}>Nama (A-Z)</option>
+                <option value="nama_desc" {{ (isset($sortBy) ? $sortBy : request('sort')) === 'nama_desc' ? 'selected' : '' }}>Nama (Z-A)</option>
+                <option value="tertinggi" {{ (isset($sortBy) ? $sortBy : request('sort')) === 'tertinggi' ? 'selected' : '' }}>Tagihan Tertinggi</option>
+                <option value="terendah" {{ (isset($sortBy) ? $sortBy : request('sort')) === 'terendah' ? 'selected' : '' }}>Tagihan Terendah</option>
+                <option value="terbaru" {{ (isset($sortBy) ? $sortBy : request('sort')) === 'terbaru' ? 'selected' : '' }}>Warga Baru (Terbaru)</option>
+            </select>
+        </div>
         <button type="submit" class="bg-secondary text-white px-4 py-1.5 rounded-lg text-sm font-bold">Tampilkan</button>
     </form>
 

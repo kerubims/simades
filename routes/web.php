@@ -11,6 +11,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Warga\DashboardController as WargaDashboardController;
 use App\Http\Controllers\Warga\RiwayatController;
 use App\Http\Controllers\Warga\SlipController;
+use App\Services\TagihanService;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,7 +21,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Root → landing page
-Route::get('/', fn () => view('welcome'))->name('home');
+Route::get('/', function (TagihanService $tagihanService) {
+    return view('welcome', ['tarif' => $tagihanService->getTarif()]);
+})->name('home');
 
 // Auth
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
