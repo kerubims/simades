@@ -17,6 +17,8 @@ class TagihanData
         public string $linkPdf,
         public ?string $buktiPembayaran = null,
         public ?string $alasanPenolakan = null,
+        public ?string $tanggalDibuat = null,
+        public ?string $tanggalPembayaran = null,
         public int $rowIndex = 0,
     ) {}
 
@@ -38,6 +40,8 @@ class TagihanData
             linkPdf: $row['link_pdf'] ?? '',
             buktiPembayaran: $row['bukti_pembayaran'] ?? null,
             alasanPenolakan: $row['alasan_penolakan'] ?? null,
+            tanggalDibuat: $row['tanggal_dibuat'] ?? null,
+            tanggalPembayaran: $row['tanggal_pembayaran'] ?? null,
             rowIndex: $rowIndex,
         );
     }
@@ -81,6 +85,8 @@ class TagihanData
             'link_pdf' => $this->linkPdf,
             'bukti_pembayaran' => $this->buktiPembayaran ?? '',
             'alasan_penolakan' => $this->alasanPenolakan ?? '',
+            'tanggal_dibuat' => $this->tanggalDibuat ?? '',
+            'tanggal_pembayaran' => $this->tanggalPembayaran ?? '',
         ];
     }
 }

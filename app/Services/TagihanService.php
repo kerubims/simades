@@ -171,6 +171,8 @@ class TagihanService
             totalTagihan: $totalTagihan,
             statusBayar: $statusBayar,
             linkPdf: $linkPdfToSave,
+            tanggalDibuat: $existing ? ($existing['data']['tanggal_dibuat'] ?? date('Y-m-d')) : date('Y-m-d'),
+            tanggalPembayaran: $existing ? ($existing['data']['tanggal_pembayaran'] ?? null) : null,
         );
 
         if ($existing) {
@@ -236,17 +238,10 @@ class TagihanService
      */
     public function tandaiLunas(TagihanData $tagihan): bool
     {
-        $success = $this->sheets->updateCell(
-            'transaksi_tagihan',
-            "I{$tagihan->rowIndex}", // kolom I = status_bayar (0-indexed: A=id, B=id_pelanggan, ... I=status_bayar)
-            'Lunas'
-        );
+        $tagihan->statusBayar = 'Lunas';
+        $tagihan->tanggalPembayaran = date('Y-m-d');
 
-        if ($success) {
-            $tagihan->statusBayar = 'Lunas';
-        }
-
-        return $success;
+        return $this->updateTagihan($tagihan);
     }
 
     /**
@@ -292,6 +287,128 @@ class TagihanService
             'belum_bayar' => $belumBayar,
             'sudah_bayar' => $sudahBayar,
             'total_pemakaian_m3' => $totalPemakaian,
+        ];
+    }
+
+    /**
+     * Riwayat pendapatan dan pemakaian untuk grafik admin (Mingguan, Bulanan, Tahunan).
+     *
+     * @return array{mingguan: array, bulanan: array, tahunan: array}
+     */
+    public function getChartDataAdmin(): array
+    {
+        $now = now();
+        $currentMonth = (int) $now->format('n');
+        $currentYear = (int) $now->format('Y');
+
+        // 1. DATA MINGGUAN (Berdasarkan parameter tanggal)
+        $tagihanBulanIni = $this->getByPeriode($currentMonth, $currentYear);
+        
+        $mingguan = [
+            ['label' => 'Minggu 1', 'pemakaian' => 0, 'pendapatan' => 0],
+            ['label' => 'Minggu 2', 'pemakaian' => 0, 'pendapatan' => 0],
+            ['label' => 'Minggu 3', 'pemakaian' => 0, 'pendapatan' => 0],
+            ['label' => 'Minggu 4', 'pemakaian' => 0, 'pendapatan' => 0],
+        ];
+
+        foreach ($tagihanBulanIni as $tagihan) {
+            // Tentukan minggu untuk pemakaian dari tanggalDibuat
+            $day = 1;
+            if ($tagihan->tanggalDibuat) {
+                $day = (int) date('j', strtotime($tagihan->tanggalDibuat));
+            }
+            
+            $weekIndex = 0;
+            if ($day >= 8 && $day <= 14) {
+                $weekIndex = 1;
+            } elseif ($day >= 15 && $day <= 21) {
+                $weekIndex = 2;
+            } elseif ($day >= 22) {
+                $weekIndex = 3;
+            }
+
+            $mingguan[$weekIndex]['pemakaian'] += $tagihan->totalPemakaianM3;
+            
+            if ($tagihan->isSudahLunas()) {
+                // Tentukan minggu untuk pendapatan dari tanggalPembayaran
+                $payDay = $day;
+                if ($tagihan->tanggalPembayaran) {
+                    $payDay = (int) date('j', strtotime($tagihan->tanggalPembayaran));
+                }
+                
+                $payWeekIndex = 0;
+                if ($payDay >= 8 && $payDay <= 14) {
+                    $payWeekIndex = 1;
+                } elseif ($payDay >= 15 && $payDay <= 21) {
+                    $payWeekIndex = 2;
+                } elseif ($payDay >= 22) {
+                    $payWeekIndex = 3;
+                }
+                
+                $mingguan[$payWeekIndex]['pendapatan'] += $tagihan->totalTagihan;
+            }
+        }
+
+        // 2. DATA BULANAN (12 bulan terakhir)
+        $bulanan = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $bulan = (int) $date->format('n');
+            $tahun = (int) $date->format('Y');
+
+            $tagihanList = $this->getByPeriode($bulan, $tahun);
+            $pemakaian = 0;
+            $pendapatan = 0;
+
+            foreach ($tagihanList as $tagihan) {
+                $pemakaian += $tagihan->totalPemakaianM3;
+                if ($tagihan->isSudahLunas()) {
+                    $pendapatan += $tagihan->totalTagihan;
+                }
+            }
+
+            $bulanan[] = [
+                'label' => $date->translatedFormat('M Y'),
+                'pemakaian' => $pemakaian,
+                'pendapatan' => $pendapatan,
+            ];
+        }
+
+        // 3. DATA TAHUNAN (5 tahun terakhir)
+        $tahunan = [];
+        for ($i = 4; $i >= 0; $i--) {
+            $tahunIterasi = $currentYear - $i;
+            $pemakaian = 0;
+            $pendapatan = 0;
+
+            // Untuk tahunan, kita bisa iterasi 12 bulan atau ambil semua tagihan
+            // Demi efisiensi sederhana, kita filter dari getAll() yang bisa di cache
+            // Namun getAll() tidak dicache lama, tapi ok.
+            // Lebih baik iterasi getAll lalu filter.
+            $tahunan[] = [
+                'label' => (string) $tahunIterasi,
+                'pemakaian' => 0,
+                'pendapatan' => 0,
+            ];
+        }
+        
+        $allTagihan = $this->getAll();
+        foreach ($allTagihan as $tagihan) {
+            foreach ($tahunan as &$thn) {
+                if ($thn['label'] == $tagihan->periodeTahun) {
+                    $thn['pemakaian'] += $tagihan->totalPemakaianM3;
+                    if ($tagihan->isSudahLunas()) {
+                        $thn['pendapatan'] += $tagihan->totalTagihan;
+                    }
+                    break;
+                }
+            }
+        }
+
+        return [
+            'mingguan' => $mingguan,
+            'bulanan' => $bulanan,
+            'tahunan' => $tahunan,
         ];
     }
 

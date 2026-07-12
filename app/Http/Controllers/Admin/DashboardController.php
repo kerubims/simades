@@ -22,7 +22,8 @@ class DashboardController extends Controller
         $bulan = (int) date('n');
         $tahun = (int) date('Y');
         $tagihanBulanIni = $this->tagihanService->getByPeriode($bulan, $tahun);
+        $chartData = $this->tagihanService->getChartDataAdmin();
 
-        return view('admin.dashboard', compact('statistik', 'totalPelanggan', 'tagihanBulanIni'));
+        return view('admin.dashboard', compact('statistik', 'totalPelanggan', 'tagihanBulanIni', 'chartData'));
     }
 }

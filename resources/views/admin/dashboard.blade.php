@@ -43,6 +43,20 @@
     </div>
 </div>
 
+<div class="bg-surface rounded-2xl shadow-sm border border-outline-variant/20 overflow-hidden mb-8 p-6">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="font-bold text-on-surface">Grafik Transaksi (Pendapatan & Pemakaian)</h2>
+        <select id="chartPeriode" class="bg-surface-container border border-outline-variant/30 text-on-surface text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5">
+            <option value="mingguan">Bulan Ini (Mingguan)</option>
+            <option value="bulanan" selected>12 Bulan Terakhir (Bulanan)</option>
+            <option value="tahunan">5 Tahun Terakhir (Tahunan)</option>
+        </select>
+    </div>
+    <div class="relative w-full h-72">
+        <canvas id="transaksiChart"></canvas>
+    </div>
+</div>
+
 <div class="bg-surface rounded-2xl shadow-sm border border-outline-variant/20 overflow-hidden">
     <div class="p-6 border-b border-outline-variant/20 flex justify-between items-center">
         <h2 class="font-bold text-on-surface">Tagihan Terbaru (Bulan Ini)</h2>
@@ -83,4 +97,101 @@
         </table>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('transaksiChart').getContext('2d');
+        const allChartData = @json($chartData);
+        let currentChart = null;
+
+        function renderChart(periode) {
+            let dataRaw = allChartData[periode] || [];
+            
+            // Untuk bulanan dan tahunan, kita balikkan karena dari terlama ke terbaru
+            if(periode === 'bulanan' || periode === 'tahunan') {
+                dataRaw = [...dataRaw].reverse();
+            }
+
+            const labels = dataRaw.map(item => item.label);
+            const dataPemakaian = dataRaw.map(item => item.pemakaian);
+            const dataPendapatan = dataRaw.map(item => item.pendapatan);
+
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            currentChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Total Pemakaian (m³)',
+                            data: dataPemakaian,
+                            backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                            borderColor: 'rgb(59, 130, 246)',
+                            borderWidth: 1,
+                            yAxisID: 'y-pemakaian'
+                        },
+                        {
+                            label: 'Total Pendapatan (Rp)',
+                            data: dataPendapatan,
+                            type: 'line',
+                            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                            borderColor: 'rgb(16, 185, 129)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true,
+                            yAxisID: 'y-pendapatan'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        'y-pemakaian': {
+                            type: 'linear',
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Pemakaian (m³)'
+                            },
+                            beginAtZero: true
+                        },
+                        'y-pendapatan': {
+                            type: 'linear',
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Pendapatan (Rp)'
+                            },
+                            beginAtZero: true,
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Render inisial berdasarkan dropdown (bulanan)
+        const dropdown = document.getElementById('chartPeriode');
+        renderChart(dropdown.value);
+
+        // Event listener saat ganti opsi dropdown
+        dropdown.addEventListener('change', function(e) {
+            renderChart(e.target.value);
+        });
+    });
+</script>
 @endsection
